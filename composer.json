@@ -1,0 +1,30 @@
+{
+    "name": "evelyn/secretaria_fiap",
+    "description": "Desafio FIAP - Criar um sistema de secretaria simplificado para gestão de alunos, turmas e matrículas",
+    "type": "project",
+    "require-dev": {
+        "phpunit/phpunit": "^12.2"
+    },
+    "authors": [
+        {
+            "name": "Evelyn",
+            "email": "evelynbrandao15@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SecretariaFiap\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        },
+        "files": [
+            ".env.php"
+        ]
+    },
+    "require": {
+        "php": "^8.3"
+    }
+}
