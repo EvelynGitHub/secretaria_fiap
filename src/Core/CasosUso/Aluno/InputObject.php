@@ -1,21 +1,21 @@
 <?php
 
-namespace SecretariaFiap\Core\CasosUso\Estudante;
+namespace SecretariaFiap\Core\CasosUso\Aluno;
 
 use DateTime;
 
 class InputObject
 {
     /**
-     * uuid será usada como identificador para edição de estudantes
+     * uuid será usada como identificador para edição de Alunos
      * @var 
      */
-    private ?string $uuid;
-    private string $nome;
-    private string $cpf;
-    private string $email;
-    private string $senha;
-    private ?DateTime $dataNascimento;
+    public ?string $uuid;
+    public string $nome;
+    public string $cpf;
+    public string $email;
+    public string $senha;
+    public ?DateTime $dataNascimento;
 
     private function __construct(array $values)
     {
@@ -40,7 +40,7 @@ class InputObject
     public function __get(string $name)
     {
         if (!property_exists($this, $name)) {
-            throw new \Exception(sprintf("Não existe essa propriedade no Estudante: '%s'", $name));
+            throw new \Exception(sprintf("Não existe essa propriedade no Aluno: '%s'", $name));
         }
 
         return $this->{$name};

@@ -1,6 +1,6 @@
 <?php
 
-namespace SecretariaFiap\Core\CasosUso\Estudante;
+namespace SecretariaFiap\Core\CasosUso\Aluno;
 
 use DateTime;
 
@@ -37,7 +37,7 @@ class OutputObject
     public function __get(string $name)
     {
         if (!property_exists($this, $name)) {
-            throw new \Exception(sprintf("Não existe essa propriedade no Estudante: '%s'", $name));
+            throw new \Exception(sprintf("Não existe essa propriedade no Aluno: '%s'", $name));
         }
 
         return $this->{$name};
