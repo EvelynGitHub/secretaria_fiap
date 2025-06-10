@@ -22,6 +22,8 @@ RUN git config --global --add safe.directory /var/www/html
 # Ativa mod_rewrite do Apache, necessário para projeto
 RUN a2enmod rewrite
 
+COPY ./apache2.conf /etc/apache2/apache2.conf
+
 # Configura o DocumentRoot do Apache para a pasta 'public' do projeto
 RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf
 

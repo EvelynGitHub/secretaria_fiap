@@ -29,6 +29,11 @@
         "ramsey/uuid": "^4.8",
         "php-di/php-di": "^7.0",
         "zircote/swagger-php": "^5.1",
-        "doctrine/annotations": "^2.0"
+        "doctrine/annotations": "^2.0",
+        "slim/slim": "^4.11",
+        "slim/psr7": "^1.7",
+        "nyholm/psr7": "^1.8",
+        "nyholm/psr7-server": "^1.1",
+        "guzzlehttp/psr7": "^2"
     }
 }

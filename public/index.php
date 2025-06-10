@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use SecretariaFiap\Adapter\Controller\AlunoController;
 use SecretariaFiap\Core\CasosUso\Admin\Login;
 use SecretariaFiap\Core\CasosUso\Aluno\Atualizar;
 use SecretariaFiap\Core\CasosUso\Aluno\Cadastrar;
@@ -16,16 +17,81 @@ use SecretariaFiap\Core\Contratos\Repositorio\AdminRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\MatriculaRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\TurmaRepositorio;
+use SecretariaFiap\Infra\Http\Middleware;
+use Slim\Factory\AppFactory;
+use Slim\Routing\RouteCollectorProxy;
+
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+
+
+header("Accept: application/json; charset=UTF-8"); //Aceita apenas coisas enviadas como JSON
+header("Content-Type: application/json; charset=UTF-8"); //tipo de retorno
 
 // Inicio: Injeção de dependência 
 require_once __DIR__ . "/../config/dependencyInjection.php"; // $container
 
-$repositorio = $container->get(AlunoRepositorio::class);
-$repositorioTurma = $container->get(TurmaRepositorio::class);
-$repositorioMatricula = $container->get(MatriculaRepositorio::class);
-$repositorioAdmin = $container->get(AdminRepositorio::class);
+// $container->set('view', fn() => new PhpRenderer(__DIR__ . '/../views'));
 
+AppFactory::setContainer($container);
 // Fim: Injeção de dependência 
+
+$app = AppFactory::create();
+
+$app->addErrorMiddleware(true, true, true);
+
+$app->get('/', function (Request $request, Response $response) {
+    $response->getBody()->write('Hello World');
+    return $response;
+});
+
+$app->get('/alunos', function (Request $request, Response $response) {
+    $response->getBody()->write('Alunos');
+    return $response;
+});
+
+// Add error middleware
+
+$app->group('/api', function (RouteCollectorProxy $api) {
+    //     $api->get('/baralho', BaralhoController::class . ':obterBaralhosUsuario')->add(Middleware::class);
+//     $api->get('/baralho/{uuid_baralho}', BaralhoController::class . ':obterBaralho')->add(Middleware::class);
+//     $api->put('/baralho/{uuid_baralho}', BaralhoController::class . ':atualizarBaralho')->add(Middleware::class);
+
+    // $api->get('/alunos', function ($request, $response, $args) {
+
+    //     $repositorio = $this->get(AlunoRepositorio::class);
+    //     $casoUso = new Cadastrar($repositorio);
+
+    //     $dados = $request->getParsedBody();
+    //     $input = InputObject::create($dados);
+    //     $output = $casoUso->executar($input);
+
+    //     $response->getBody()->write(json_encode($output));
+    //     return $response->withHeader('Content-Type', 'application/json');
+    // });
+
+
+    $api->get('/alunos', AlunoController::class . ":listar");
+});//->add(Middleware::class);
+
+// $api->get('/alunos', function ($request, $response, $args) {
+
+//     echo "Listando alunos...";
+
+//     $repositorio = $this->get(AlunoRepositorio::class);
+//     $casoUso = new Cadastrar($repositorio);
+
+//     $dados = $request->getParsedBody();
+//     $input = InputObject::create($dados);
+//     $output = $casoUso->executar($input);
+
+//     $response->getBody()->write(json_encode($output));
+//     return $response->withHeader('Content-Type', 'application/json');
+// });
+
+$app->run();
+
+
 
 // Inicio: Testes dos CRUDs
 // --> Aluno
@@ -133,24 +199,24 @@ $repositorioAdmin = $container->get(AdminRepositorio::class);
 // render($output, "Matriculando Aluno");
 
 // --> Admin
-use SecretariaFiap\Core\CasosUso\Admin\InputObject as AdminInput;
+// use SecretariaFiap\Core\CasosUso\Admin\InputObject as AdminInput;
 
-$login = new Login($repositorioAdmin);
-$input = AdminInput::create([
-    'email' => 'admin@fiap.com.br',
-    'senha' => 'Admin@123'
-]);
-$output = $login->executar($input);
-render($output, "Login do Admin");
+// $login = new Login($repositorioAdmin);
+// $input = AdminInput::create([
+//     'email' => 'admin@fiap.com.br',
+//     'senha' => 'Admin@123'
+// ]);
+// $output = $login->executar($input);
+// render($output, "Login do Admin");
 
-// Inicio: Testes dos CRUDs
+// // Inicio: Testes dos CRUDs
 
-function render($dados, $mensagem)
-{
-    if (!empty($mensagem))
-        echo "<h3> -------- $mensagem -------- </h3>";
-    echo "<pre>";
-    print_r($dados);
-    echo "</pre>";
-    echo "<hr>";
-}
+// function render($dados, $mensagem)
+// {
+//     if (!empty($mensagem))
+//         echo "<h3> -------- $mensagem -------- </h3>";
+//     echo "<pre>";
+//     print_r($dados);
+//     echo "</pre>";
+//     echo "<hr>";
+// }
