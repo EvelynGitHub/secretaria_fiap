@@ -21,5 +21,14 @@ interface AlunoRepositorio
      * @return Paginacao<Aluno> Um objeto Paginacao contendo uma lista de objetos Aluno.
      */
     public function listarPorFiltros(string $nome, int $offset = 0, int $limit = 10): Paginacao;
+    /**
+     * Lista alunos por turma, retornando um objeto de paginação.
+     *
+     * @param string $nome O nome a ser filtrado.
+     * @param int $offset O offset para a paginação.
+     * @param int $limit O limite de registros por página.
+     * @return Paginacao<Aluno> Um objeto Paginacao contendo uma lista de objetos Aluno.
+     */
+    public function listarPorTurma(string $uuidTurma, int $offset = 0, int $limit = 10): Paginacao;
 
 }

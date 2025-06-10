@@ -8,6 +8,7 @@ use SecretariaFiap\Core\CasosUso\Aluno\Atualizar;
 use SecretariaFiap\Core\CasosUso\Aluno\Cadastrar;
 use SecretariaFiap\Core\CasosUso\Aluno\InputObject;
 use SecretariaFiap\Core\CasosUso\Aluno\Listar;
+use SecretariaFiap\Core\CasosUso\Aluno\ListarPorTurma;
 use SecretariaFiap\Core\CasosUso\Aluno\Obter;
 use SecretariaFiap\Core\CasosUso\Aluno\Remover;
 use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
@@ -66,6 +67,13 @@ $repositorioMatricula = $container->get(MatriculaRepositorio::class);
 // $outputRemove = $casoUsoRemover->executar($output->uuid);
 // render($outputRemove, "Removendo dados do João");
 
+// 3e4d1dca-6d7c-4869-91af-411c21350b40 - Turma sem alunos
+// e2f52eb1-8fca-4de1-9d55-03eb24267f7f - Turma com alunos
+$casoUsoListarAlunosPorTurma = new ListarPorTurma($repositorio);
+$outputRemove = $casoUsoListarAlunosPorTurma->executar('e2f52eb1-8fca-4de1-9d55-03eb24267f7f');
+render($outputRemove, "Alunos por Turma");
+
+
 
 // --> Turma
 // $casoUsoCadastroT = new \SecretariaFiap\Core\CasosUso\Turma\Cadastrar($repositorioTurma);
@@ -105,20 +113,20 @@ $repositorioMatricula = $container->get(MatriculaRepositorio::class);
 
 
 // --> Matricula
-$input = \SecretariaFiap\Core\CasosUso\Matricula\InputObject::create([
-    'uuid_aluno' => '52f7b495-458d-11f0-a0d1-4208e9f4cc4d',
-    'uuid_turma' => 'e2f52eb1-8fca-4de1-9d55-03eb24267f7f'
-]);
+// $input = \SecretariaFiap\Core\CasosUso\Matricula\InputObject::create([
+//     'uuid_aluno' => '52f7b495-458d-11f0-a0d1-4208e9f4cc4d',
+//     'uuid_turma' => 'e2f52eb1-8fca-4de1-9d55-03eb24267f7f'
+// ]);
 
-$casoUsoMatricula = new \SecretariaFiap\Core\CasosUso\Matricula\MatricularAluno(
-    $repositorio,
-    $repositorioTurma,
-    $repositorioMatricula
-);
+// $casoUsoMatricula = new \SecretariaFiap\Core\CasosUso\Matricula\MatricularAluno(
+//     $repositorio,
+//     $repositorioTurma,
+//     $repositorioMatricula
+// );
 
-$output = $casoUsoMatricula->executar($input);
+// $output = $casoUsoMatricula->executar($input);
 
-render($output, "Matriculando Aluno");
+// render($output, "Matriculando Aluno");
 
 // Inicio: Testes dos CRUDs
 

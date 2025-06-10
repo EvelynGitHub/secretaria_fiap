@@ -128,6 +128,58 @@ class AlunoRepositorioPDO implements AlunoRepositorio
         );
     }
 
+    /**
+     * Lista alunos por turma, retornando um objeto de paginação.
+     *
+     * @param string $uuidTurma O UUID da turma a ser filtrada.
+     * @param int $offset O offset para a paginação.
+     * @param int $limit O limite de registros por página.
+     * @return Paginacao<Aluno> Um objeto Paginacao contendo uma lista de objetos Aluno.
+     */
+    public function listarPorTurma(string $uuidTurma, int $offset = 0, int $limit = 10): Paginacao
+    {
+        // 1. Consulta para obter os dados da página atual
+        $sqlDados = "SELECT alunos.* 
+            FROM alunos 
+            JOIN matriculas ON alunos.id = matriculas.aluno_id 
+            JOIN turmas ON matriculas.turma_id = turmas.id 
+            WHERE turmas.uuid = :uuidTurma
+            LIMIT :offset, :limit";
+
+        $stmtDados = $this->pdo->prepare($sqlDados);
+        $stmtDados->bindValue(':uuidTurma', $uuidTurma);
+        $stmtDados->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmtDados->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmtDados->execute();
+
+        $alunos = [];
+        while ($row = $stmtDados->fetch(PDO::FETCH_ASSOC)) {
+            $alunos[] = $this->mapearParaEntidade($row);
+        }
+
+        // 2. Consulta separada para obter o total de registros
+        $sqlTotal = "SELECT COUNT(alunos.id) 
+            FROM alunos 
+            JOIN matriculas ON alunos.id = matriculas.aluno_id 
+            JOIN turmas ON matriculas.turma_id = turmas.id 
+            WHERE turmas.uuid = :uuidTurma";
+        $stmtTotal = $this->pdo->prepare($sqlTotal);
+        $stmtTotal->bindValue(':uuidTurma', $uuidTurma);
+        $stmtTotal->execute();
+        $totalRegistros = $stmtTotal->fetchColumn();
+
+        $totalPaginas = (int) ceil($totalRegistros / $limit);
+        $paginaAtual = (int) ($offset / $limit) + 1;
+
+        return new Paginacao(
+            paginaAtual: $paginaAtual,
+            totalRegistros: (int) $totalRegistros,
+            totalPaginas: $totalPaginas,
+            limite: $limit,
+            itens: $alunos
+        );
+    }
+
     private function mapearParaEntidade(array $dados): Aluno
     {
         $aluno = new Aluno(
