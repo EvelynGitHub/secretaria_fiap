@@ -11,6 +11,7 @@ use SecretariaFiap\Core\CasosUso\Aluno\Listar;
 use SecretariaFiap\Core\CasosUso\Aluno\Obter;
 use SecretariaFiap\Core\CasosUso\Aluno\Remover;
 use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
+use SecretariaFiap\Core\Contratos\Repositorio\MatriculaRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\TurmaRepositorio;
 
 // Inicio: Injeção de dependência 
@@ -18,6 +19,7 @@ require_once __DIR__ . "/../config/dependencyInjection.php"; // $container
 
 $repositorio = $container->get(AlunoRepositorio::class);
 $repositorioTurma = $container->get(TurmaRepositorio::class);
+$repositorioMatricula = $container->get(MatriculaRepositorio::class);
 // Fim: Injeção de dependência 
 
 // Inicio: Testes dos CRUDs
@@ -66,40 +68,57 @@ $repositorioTurma = $container->get(TurmaRepositorio::class);
 
 
 // --> Turma
-$casoUsoCadastroT = new \SecretariaFiap\Core\CasosUso\Turma\Cadastrar($repositorioTurma);
+// $casoUsoCadastroT = new \SecretariaFiap\Core\CasosUso\Turma\Cadastrar($repositorioTurma);
 
-$input = \SecretariaFiap\Core\CasosUso\Turma\InputObject::create([
-    'nome' => 'Turma de IA 1',
-    'descricao' => "Engenharia de IA"
+// $input = \SecretariaFiap\Core\CasosUso\Turma\InputObject::create([
+//     'nome' => 'Turma de IA 1',
+//     'descricao' => "Engenharia de IA"
+// ]);
+
+// $output = $casoUsoCadastroT->executar($input);
+
+// render($output, "Cadastro de Turma IA");
+
+// $casoUsoObterT = new \SecretariaFiap\Core\CasosUso\Turma\Obter($repositorioTurma);
+// $outputObterT = $casoUsoObterT->executar($output->uuid);
+// render($outputObterT, "Obtendo dados do Turma IA");
+
+
+// $editT = \SecretariaFiap\Core\CasosUso\Turma\InputObject::create([
+//     'nome' => $outputObterT->nome . " Abacaxi",
+//     // 'descricao' => "Engenharia de IA",
+//     'uuid' => $outputObterT->uuid
+// ]);
+// $casoUsoEditar = new \SecretariaFiap\Core\CasosUso\Turma\Atualizar($repositorioTurma);
+// $outputEditT = $casoUsoEditar->executar($editT);
+// render($outputEditT, "Atualizando dados do Turma IA");
+
+
+// $casoUsoListarT = new \SecretariaFiap\Core\CasosUso\Turma\Listar($repositorioTurma);
+// $outputListaT = $casoUsoListarT->executar();
+// render($outputListaT, "Listando dados das turmas");
+
+
+// $casoUsoRemoverT = new \SecretariaFiap\Core\CasosUso\Turma\Remover($repositorioTurma);
+// $outputRemoveT = $casoUsoRemoverT->executar($output->uuid);
+// render($outputRemoveT, "Removendo dados do Turma IA");
+
+
+// --> Matricula
+$input = \SecretariaFiap\Core\CasosUso\Matricula\InputObject::create([
+    'uuid_aluno' => '52f7b495-458d-11f0-a0d1-4208e9f4cc4d',
+    'uuid_turma' => 'e2f52eb1-8fca-4de1-9d55-03eb24267f7f'
 ]);
 
-$output = $casoUsoCadastroT->executar($input);
+$casoUsoMatricula = new \SecretariaFiap\Core\CasosUso\Matricula\MatricularAluno(
+    $repositorio,
+    $repositorioTurma,
+    $repositorioMatricula
+);
 
-render($output, "Cadastro de Turma IA");
+$output = $casoUsoMatricula->executar($input);
 
-$casoUsoObterT = new \SecretariaFiap\Core\CasosUso\Turma\Obter($repositorioTurma);
-$outputObterT = $casoUsoObterT->executar($output->uuid);
-render($outputObterT, "Obtendo dados do Turma IA");
-
-
-$editT = \SecretariaFiap\Core\CasosUso\Turma\InputObject::create([
-    'nome' => $outputObterT->nome . " Abacaxi",
-    // 'descricao' => "Engenharia de IA",
-    'uuid' => $outputObterT->uuid
-]);
-$casoUsoEditar = new \SecretariaFiap\Core\CasosUso\Turma\Atualizar($repositorioTurma);
-$outputEditT = $casoUsoEditar->executar($editT);
-render($outputEditT, "Atualizando dados do Turma IA");
-
-
-$casoUsoListarT = new \SecretariaFiap\Core\CasosUso\Turma\Listar($repositorioTurma);
-$outputListaT = $casoUsoListarT->executar();
-render($outputListaT, "Listando dados das turmas");
-
-
-$casoUsoRemoverT = new \SecretariaFiap\Core\CasosUso\Turma\Remover($repositorioTurma);
-$outputRemoveT = $casoUsoRemoverT->executar($output->uuid);
-render($outputRemoveT, "Removendo dados do Turma IA");
+render($output, "Matriculando Aluno");
 
 // Inicio: Testes dos CRUDs
 

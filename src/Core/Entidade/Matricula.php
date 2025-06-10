@@ -8,6 +8,7 @@ use SecretariaFiap\Helpers\GeradorUuid;
 
 class Matricula
 {
+    private int $id;
     private string $uuid;
     private Aluno $aluno;
     private Turma $turma;
@@ -22,6 +23,16 @@ class Matricula
         $this->turma = $turma;
         $this->dataMatricula = new \DateTime();
         $this->uuid = $uuid ?? GeradorUuid::gerar();
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function setUuid(string $uuid): void
@@ -47,9 +58,4 @@ class Matricula
         return $this->dataMatricula;
     }
 
-    public function isMesmoAlunoETurma(Aluno $aluno, Turma $turma): bool
-    {
-        return $this->aluno->getCpf() === $aluno->getCpf()
-            && $this->turma->getNome() === $turma->getNome();
-    }
 }

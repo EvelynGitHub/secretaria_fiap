@@ -37,6 +37,6 @@ class MatricularAluno
         $matricula = new Matricula($aluno, $turma);
         $this->matriculaRepositorio->salvar($matricula);
 
-        return new OutputObject(true, "Matrícula realizada com sucesso.");
+        return new OutputObject(true, "{$aluno->getNome()} matriculado(a) em {$turma->getNome()} com sucesso.");
     }
 }

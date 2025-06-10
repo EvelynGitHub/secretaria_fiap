@@ -12,14 +12,4 @@ interface MatriculaRepositorio
 {
     public function salvar(Matricula $matricula): Matricula;
     public function existe(int $idAluno, int $idTurma): bool;
-
-    /**
-     * Lista alunos por turma, retornando um objeto de paginação.
-     *
-     * @param string $uuidTurma A turma que deve ter seus alunos listados.
-     * @param int $offset O offset para a paginação.
-     * @param int $limit O limite de registros por página.
-     * @return Paginacao<Aluno> Um objeto Paginacao contendo uma lista de objetos Aluno.
-     */
-    public function listarPorFiltros(string $uuidTurma, int $offset = 0, int $limit = 10): Paginacao;
 }
