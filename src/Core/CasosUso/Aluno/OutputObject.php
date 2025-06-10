@@ -2,15 +2,15 @@
 
 namespace SecretariaFiap\Core\CasosUso\Aluno;
 
-use DateTime;
+use SecretariaFiap\Helpers\OutputObjectInterface;
 
-class OutputObject
+class OutputObject implements OutputObjectInterface
 {
-    private string $uuid;
-    private string $nome;
-    private string $cpf;
-    private string $email;
-    private string $dataNascimento;
+    public readonly string $uuid;
+    public readonly string $nome;
+    public readonly string $cpf;
+    public readonly string $email;
+    public readonly string $dataNascimento;
 
     private function __construct(array $values)
     {
@@ -19,27 +19,21 @@ class OutputObject
         $this->cpf = $values['cpf'] ?? null;
         $this->email = $values['email'] ?? null;
         $this->dataNascimento = $values['data_nascimento'] ?? null;
-
     }
 
-    public static function create(array $data): OutputObject
+    public static function create(array $data): self
     {
-        // $data['data_nascimento'] = $data['data_nascimento'];
-        return new OutputObject($data);
+        return new self($data);
     }
 
-    public static function paginar(array $data): OutputObject
+    public function toArray(): array
     {
-        // $data['data_nascimento'] = new DateTime($data['data_nascimento']);
-        return new OutputObject($data);
-    }
-
-    public function __get(string $name)
-    {
-        if (!property_exists($this, $name)) {
-            throw new \Exception(sprintf("Não existe essa propriedade no Aluno: '%s'", $name));
-        }
-
-        return $this->{$name};
+        return [
+            'uuid' => $this->uuid,
+            'nome' => $this->nome,
+            'cpf' => $this->cpf,
+            'email' => $this->email,
+            'data_nascimento' => $this->dataNascimento,
+        ];
     }
 }

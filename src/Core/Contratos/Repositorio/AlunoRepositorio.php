@@ -3,6 +3,7 @@
 namespace SecretariaFiap\Core\Contratos\Repositorio;
 
 use SecretariaFiap\Core\Entidade\Aluno;
+use SecretariaFiap\Helpers\Paginacao;
 
 interface AlunoRepositorio
 {
@@ -12,12 +13,13 @@ interface AlunoRepositorio
     public function buscarPorUuid(string $uuid): ?Aluno;
     public function buscarPorCpf(string $cpf): ?Aluno;
     /**
-     * Retorna uma lista paginada de alunos que pode ser filtrada pelo nome
-     * @param string $nome Nome do aluno
-     * @param int $offset
-     * @param int $limit
-     * @return object {} contendo os metadados da paginação e a lista de Aluno
+     * Lista alunos por filtros, retornando um objeto de paginação.
+     *
+     * @param string $nome O nome a ser filtrado.
+     * @param int $offset O offset para a paginação.
+     * @param int $limit O limite de registros por página.
+     * @return Paginacao<Aluno> Um objeto Paginacao contendo uma lista de objetos Aluno.
      */
-    public function listarPorFiltros(string $nome, int $offset = 0, int $limit = 10): object;
+    public function listarPorFiltros(string $nome, int $offset = 0, int $limit = 10): Paginacao;
 
 }

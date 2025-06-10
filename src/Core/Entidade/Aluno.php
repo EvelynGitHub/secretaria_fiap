@@ -13,6 +13,7 @@ class Aluno
     private string $nome;
     private string $cpf;
     private string $email;
+    private string $senha;
     private string $senhaHash;
     private ?\DateTime $dataNascimento;
 

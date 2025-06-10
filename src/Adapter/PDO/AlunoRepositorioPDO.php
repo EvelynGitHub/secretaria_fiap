@@ -8,6 +8,7 @@ use PDO;
 use PDOException;
 use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
 use SecretariaFiap\Core\Entidade\Aluno;
+use SecretariaFiap\Helpers\Paginacao;
 use SecretariaFiap\Infra\Banco\Conexao;
 
 class AlunoRepositorioPDO implements AlunoRepositorio
@@ -84,11 +85,20 @@ class AlunoRepositorioPDO implements AlunoRepositorio
         return $dados ? $this->mapearParaEntidade($dados) : null;
     }
 
-    public function listarPorFiltros(string $nome, int $offset = 0, int $limit = 10): object
+    /**
+     * Lista alunos por filtros, retornando um objeto de paginação.
+     *
+     * @param string $nome O nome a ser filtrado.
+     * @param int $offset O offset para a paginação.
+     * @param int $limit O limite de registros por página.
+     * @return Paginacao<Aluno> Um objeto Paginacao contendo uma lista de objetos Aluno.
+     */
+    public function listarPorFiltros(string $nome, int $offset = 0, int $limit = 10): Paginacao
     {
         $stmt = $this->pdo->prepare("
-            SELECT SQL_CALC_FOUND_ROWS * FROM alunos 
-            WHERE nome LIKE :nome ORDER BY nome ASC 
+            SELECT * FROM alunos 
+            WHERE nome LIKE :nome 
+            ORDER BY nome ASC 
             LIMIT :limit OFFSET :offset
         ");
         $stmt->bindValue(':nome', "%{$nome}%");
@@ -101,14 +111,17 @@ class AlunoRepositorioPDO implements AlunoRepositorio
             $alunos[] = $this->mapearParaEntidade($row);
         }
 
-        $total = $this->pdo->query("SELECT FOUND_ROWS()")->fetchColumn();
+        $totalRegistros = $this->pdo->query("SELECT FOUND_ROWS()")->fetchColumn();
+        $totalPaginas = (int) ceil($totalRegistros / $limit);
+        $paginaAtual = (int) ($offset / $limit) + 1;
 
-        return (object) [
-            'pagina' => (int) ($offset / $limit) + 1,
-            'total' => (int) $total,
-            'limite' => $limit,
-            'alunos' => $alunos,
-        ];
+        return new Paginacao(
+            paginaAtual: $paginaAtual,
+            totalRegistros: (int) $totalRegistros,
+            totalPaginas: $totalPaginas,
+            limite: $limit,
+            itens: $alunos
+        );
     }
 
     private function mapearParaEntidade(array $dados): Aluno
