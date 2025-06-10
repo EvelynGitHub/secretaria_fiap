@@ -8,30 +8,29 @@ use SecretariaFiap\Helpers\GeradorUuid;
 
 class Aluno
 {
+    // Poderia usar Value Object para outros atributos também
     private ?int $id = null;
     private string $uuid;
     private string $nome;
     private string $cpf;
     private string $email;
-    private string $senha;
-    private string $senhaHash;
+    private Senha $senha;
     private ?\DateTime $dataNascimento;
 
     public function __construct(
         string $nome,
         string $cpf,
         string $email,
-        string $senha,
+        Senha $senha,
         ?\DateTime $dataNascimento,
         ?string $uuid = null
     ) {
         $this->definirNome($nome);
         $this->validarCpf($cpf);
         $this->validarEmail($email);
-        $this->validarSenha($senha);
         $this->cpf = $cpf;
         $this->email = $email;
-        $this->senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+        $this->senha = $senha;
         $this->dataNascimento = $dataNascimento;
         $this->uuid = $uuid ?? GeradorUuid::gerar();
     }
@@ -55,19 +54,6 @@ class Aluno
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new \InvalidArgumentException("E-mail inválido.");
-        }
-    }
-
-    private function validarSenha(string $senha): void
-    {
-        if (
-            strlen($senha) < 8 ||
-            !preg_match('/[A-Z]/', $senha) ||
-            !preg_match('/[a-z]/', $senha) ||
-            !preg_match('/[0-9]/', $senha) ||
-            !preg_match('/[\W]/', $senha)
-        ) {
-            throw new \InvalidArgumentException("Senha fraca.");
         }
     }
 
@@ -101,9 +87,9 @@ class Aluno
         return $this->cpf;
     }
 
-    public function getSenhaHash(): string
+    public function getSenha(): string
     {
-        return $this->senhaHash;
+        return $this->senha->getHash();
     }
 
     public function getNome(): string

@@ -8,6 +8,7 @@ use DateTime;
 use Exception;
 use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
 use SecretariaFiap\Core\Entidade\Aluno;
+use SecretariaFiap\Core\Entidade\Senha;
 
 class Atualizar
 {
@@ -27,12 +28,19 @@ class Atualizar
             throw new Exception("O aluno informado não existe.", 404);
         }
 
+        if (!empty($inputObject->senha)) {
+            // Caso esteja atualizando a senha
+            $senha = Senha::criar($inputObject->senha);
+        } else {
+            // Caso esteja mantendo a senha antiga
+            $senha = Senha::criarAPartirDoHash($alunoExiste->getSenha());
+        }
 
         $aluno = new Aluno(
             $inputObject->nome ?? $alunoExiste->getNome(),
             $inputObject->cpf ?? $alunoExiste->getCpf(),
             $inputObject->email ?? $alunoExiste->getEmail(),
-            $inputObject->senha ?? $alunoExiste->getSenhaHash(),
+            $senha,
             new DateTime($inputObject->dataNascimento) ?? $alunoExiste->getDataNascimento(),
             $inputObject->uuid //UUID para atualização
         );

@@ -8,6 +8,7 @@ use PDO;
 use PDOException;
 use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
 use SecretariaFiap\Core\Entidade\Aluno;
+use SecretariaFiap\Core\Entidade\Senha;
 use SecretariaFiap\Helpers\Paginacao;
 use SecretariaFiap\Infra\Banco\Conexao;
 
@@ -31,7 +32,7 @@ class AlunoRepositorioPDO implements AlunoRepositorio
                 ':nome' => $aluno->getNome(),
                 ':cpf' => $aluno->getCpf(),
                 ':email' => $aluno->getEmail(),
-                ':senha' => $aluno->getSenhaHash(),
+                ':senha' => $aluno->getSenha(),
                 ':nascimento' => $aluno->getDataNascimento()->format('Y-m-d'),
             ]);
             $aluno->setId((int) $this->pdo->lastInsertId());
@@ -50,7 +51,7 @@ class AlunoRepositorioPDO implements AlunoRepositorio
             return $stmt->execute([
                 ':nome' => $aluno->getNome(),
                 ':email' => $aluno->getEmail(),
-                ':senha' => $aluno->getSenhaHash(),
+                ':senha' => $aluno->getSenha(),
                 ':nascimento' => $aluno->getDataNascimento()->format('Y-m-d'),
                 ':uuid' => $aluno->getUuid(),
             ]);
@@ -130,7 +131,7 @@ class AlunoRepositorioPDO implements AlunoRepositorio
             $dados['nome'],
             $dados['cpf'],
             $dados['email'],
-            $dados['senha_hash'],
+            Senha::criarAPartirDoHash($dados['senha_hash']),
             new \DateTime($dados['data_nascimento']),
             $dados['uuid']
         );

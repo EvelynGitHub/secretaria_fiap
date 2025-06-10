@@ -7,6 +7,7 @@ namespace SecretariaFiap\Core\CasosUso\Aluno;
 use DateTime;
 use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
 use SecretariaFiap\Core\Entidade\Aluno;
+use SecretariaFiap\Core\Entidade\Senha;
 
 class Cadastrar
 {
@@ -23,7 +24,7 @@ class Cadastrar
             $inputObject->nome,
             $inputObject->cpf,
             $inputObject->email,
-            $inputObject->senha,
+            Senha::criar($inputObject->senha),
             new DateTime($inputObject->dataNascimento)
         );
 
