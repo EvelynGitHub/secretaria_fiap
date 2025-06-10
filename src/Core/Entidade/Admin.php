@@ -6,15 +6,17 @@ namespace SecretariaFiap\Core\Entidade;
 
 class Admin
 {
+    private string $id;
+    private string $uuid;
     private string $nome;
     private string $email;
-    private string $senhaHash;
+    private Senha $senha;
 
-    public function __construct(string $nome, string $email, string $senha)
+    public function __construct(string $nome, string $email, Senha $senha)
     {
         $this->nome = $nome;
         $this->definirEmail($email);
-        $this->definirSenha($senha);
+        $this->senha = $senha;
     }
 
     private function definirEmail(string $email): void
@@ -25,23 +27,33 @@ class Admin
         $this->email = $email;
     }
 
-    private function definirSenha(string $senha): void
+    public function getId(): string
     {
-        if (
-            strlen($senha) < 8 ||
-            !preg_match('/[A-Z]/', $senha) ||
-            !preg_match('/[a-z]/', $senha) ||
-            !preg_match('/[0-9]/', $senha) ||
-            !preg_match('/[\W]/', $senha)
-        ) {
-            throw new \InvalidArgumentException("Senha fraca.");
-        }
-        $this->senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+        return $this->id;
+    }
+    public function getUuid(): string
+    {
+        return $this->uuid;
     }
 
-    public function verificarSenha(string $senha): bool
+    public function setId(string $id): void
     {
-        return password_verify($senha, $this->senhaHash);
+        $this->id = $id;
+    }
+
+    public function setUuid(string $uuid): void
+    {
+        $this->uuid = $uuid;
+    }
+
+    public function setSenha(Senha $senha): void
+    {
+        $this->senha = $senha;
+    }
+
+    public function getSenha(): Senha
+    {
+        return $this->senha;
     }
 
     public function getEmail(): string

@@ -1,8 +1,10 @@
 <?php
 
+use SecretariaFiap\Adapter\PDO\AdminRepositorioPDO;
 use SecretariaFiap\Adapter\PDO\AlunoRepositorioPDO;
 use SecretariaFiap\Adapter\PDO\MatriculaRepositorioPDO;
 use SecretariaFiap\Adapter\PDO\TurmaRepositorioPDO;
+use SecretariaFiap\Core\Contratos\Repositorio\AdminRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\MatriculaRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\TurmaRepositorio;
@@ -16,6 +18,7 @@ $containerBuilder->addDefinitions([
     AlunoRepositorio::class => \DI\get(AlunoRepositorioPDO::class),
     TurmaRepositorio::class => \DI\get(TurmaRepositorioPDO::class),
     MatriculaRepositorio::class => \DI\get(MatriculaRepositorioPDO::class),
+    AdminRepositorio::class => \DI\get(AdminRepositorioPDO::class),
 ]);
 
 $container = $containerBuilder->build();

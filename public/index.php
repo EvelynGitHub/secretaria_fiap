@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use SecretariaFiap\Core\CasosUso\Admin\Login;
 use SecretariaFiap\Core\CasosUso\Aluno\Atualizar;
 use SecretariaFiap\Core\CasosUso\Aluno\Cadastrar;
 use SecretariaFiap\Core\CasosUso\Aluno\InputObject;
@@ -11,6 +12,7 @@ use SecretariaFiap\Core\CasosUso\Aluno\Listar;
 use SecretariaFiap\Core\CasosUso\Aluno\ListarPorTurma;
 use SecretariaFiap\Core\CasosUso\Aluno\Obter;
 use SecretariaFiap\Core\CasosUso\Aluno\Remover;
+use SecretariaFiap\Core\Contratos\Repositorio\AdminRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\MatriculaRepositorio;
 use SecretariaFiap\Core\Contratos\Repositorio\TurmaRepositorio;
@@ -21,6 +23,8 @@ require_once __DIR__ . "/../config/dependencyInjection.php"; // $container
 $repositorio = $container->get(AlunoRepositorio::class);
 $repositorioTurma = $container->get(TurmaRepositorio::class);
 $repositorioMatricula = $container->get(MatriculaRepositorio::class);
+$repositorioAdmin = $container->get(AdminRepositorio::class);
+
 // Fim: Injeção de dependência 
 
 // Inicio: Testes dos CRUDs
@@ -69,9 +73,9 @@ $repositorioMatricula = $container->get(MatriculaRepositorio::class);
 
 // 3e4d1dca-6d7c-4869-91af-411c21350b40 - Turma sem alunos
 // e2f52eb1-8fca-4de1-9d55-03eb24267f7f - Turma com alunos
-$casoUsoListarAlunosPorTurma = new ListarPorTurma($repositorio);
-$outputRemove = $casoUsoListarAlunosPorTurma->executar('e2f52eb1-8fca-4de1-9d55-03eb24267f7f');
-render($outputRemove, "Alunos por Turma");
+// $casoUsoListarAlunosPorTurma = new ListarPorTurma($repositorio);
+// $outputRemove = $casoUsoListarAlunosPorTurma->executar('e2f52eb1-8fca-4de1-9d55-03eb24267f7f');
+// render($outputRemove, "Alunos por Turma");
 
 
 
@@ -127,6 +131,17 @@ render($outputRemove, "Alunos por Turma");
 // $output = $casoUsoMatricula->executar($input);
 
 // render($output, "Matriculando Aluno");
+
+// --> Admin
+use SecretariaFiap\Core\CasosUso\Admin\InputObject as AdminInput;
+
+$login = new Login($repositorioAdmin);
+$input = AdminInput::create([
+    'email' => 'admin@fiap.com.br',
+    'senha' => 'Admin@123'
+]);
+$output = $login->executar($input);
+render($output, "Login do Admin");
 
 // Inicio: Testes dos CRUDs
 
