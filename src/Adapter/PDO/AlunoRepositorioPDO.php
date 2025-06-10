@@ -96,23 +96,26 @@ class AlunoRepositorioPDO implements AlunoRepositorio
      */
     public function listarPorFiltros(string $nome, int $offset = 0, int $limit = 10): Paginacao
     {
-        $stmt = $this->pdo->prepare("
-            SELECT * FROM alunos 
-            WHERE nome LIKE :nome 
-            ORDER BY nome ASC 
-            LIMIT :limit OFFSET :offset
-        ");
-        $stmt->bindValue(':nome', "%{$nome}%");
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
+        // 1. Consulta para obter os dados da página atual
+        $sqlDados = "SELECT * FROM alunos WHERE nome LIKE :nome LIMIT :offset, :limit";
+        $stmtDados = $this->pdo->prepare($sqlDados);
+        $stmtDados->bindValue(':nome', "%{$nome}%");
+        $stmtDados->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmtDados->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmtDados->execute();
 
         $alunos = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $stmtDados->fetch(PDO::FETCH_ASSOC)) {
             $alunos[] = $this->mapearParaEntidade($row);
         }
 
-        $totalRegistros = $this->pdo->query("SELECT FOUND_ROWS()")->fetchColumn();
+        // 2. Consulta separada para obter o total de registros
+        $sqlTotal = "SELECT COUNT(id) FROM alunos WHERE nome LIKE :nome";
+        $stmtTotal = $this->pdo->prepare($sqlTotal);
+        $stmtTotal->bindValue(':nome', "%{$nome}%");
+        $stmtTotal->execute();
+        $totalRegistros = $stmtTotal->fetchColumn();
+
         $totalPaginas = (int) ceil($totalRegistros / $limit);
         $paginaAtual = (int) ($offset / $limit) + 1;
 
