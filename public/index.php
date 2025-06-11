@@ -85,41 +85,6 @@ $app->run();
 // --> Aluno
 
 // --> Turma
-// $casoUsoCadastroT = new \SecretariaFiap\Core\CasosUso\Turma\Cadastrar($repositorioTurma);
-
-// $input = \SecretariaFiap\Core\CasosUso\Turma\InputObject::create([
-//     'nome' => 'Turma de IA 1',
-//     'descricao' => "Engenharia de IA"
-// ]);
-
-// $output = $casoUsoCadastroT->executar($input);
-
-// render($output, "Cadastro de Turma IA");
-
-// $casoUsoObterT = new \SecretariaFiap\Core\CasosUso\Turma\Obter($repositorioTurma);
-// $outputObterT = $casoUsoObterT->executar($output->uuid);
-// render($outputObterT, "Obtendo dados do Turma IA");
-
-
-// $editT = \SecretariaFiap\Core\CasosUso\Turma\InputObject::create([
-//     'nome' => $outputObterT->nome . " Abacaxi",
-//     // 'descricao' => "Engenharia de IA",
-//     'uuid' => $outputObterT->uuid
-// ]);
-// $casoUsoEditar = new \SecretariaFiap\Core\CasosUso\Turma\Atualizar($repositorioTurma);
-// $outputEditT = $casoUsoEditar->executar($editT);
-// render($outputEditT, "Atualizando dados do Turma IA");
-
-
-// $casoUsoListarT = new \SecretariaFiap\Core\CasosUso\Turma\Listar($repositorioTurma);
-// $outputListaT = $casoUsoListarT->executar();
-// render($outputListaT, "Listando dados das turmas");
-
-
-// $casoUsoRemoverT = new \SecretariaFiap\Core\CasosUso\Turma\Remover($repositorioTurma);
-// $outputRemoveT = $casoUsoRemoverT->executar($output->uuid);
-// render($outputRemoveT, "Removendo dados do Turma IA");
-
 
 // --> Matricula
 // $input = \SecretariaFiap\Core\CasosUso\Matricula\InputObject::create([
