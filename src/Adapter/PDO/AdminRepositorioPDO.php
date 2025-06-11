@@ -27,7 +27,7 @@ class AdminRepositorioPDO implements AdminRepositorio
             return null;
         }
 
-        $admin = new Admin($dados['uuid'], $dados['email'], Senha::criarAPartirDoHash($dados['senha_hash']));
+        $admin = new Admin($dados['nome'], $dados['email'], Senha::criarAPartirDoHash($dados['senha_hash']));
         $admin->setId($dados['id']);
         $admin->setUuid($dados['uuid']);
         return $admin;

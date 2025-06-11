@@ -1,4 +1,6 @@
 <?php
+// Salt para o token JWT, usado para assinar o token
+putenv("TOKEN_SALT=fiap"); 
 
 putenv("DB_DRIVE=mysql");
 

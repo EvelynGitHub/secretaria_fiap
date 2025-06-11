@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use SecretariaFiap\Adapter\Controller\AdminController;
 use SecretariaFiap\Adapter\Controller\AlunoController;
 use SecretariaFiap\Adapter\Controller\MatriculaController;
 use SecretariaFiap\Adapter\Controller\TurmaController;
-use SecretariaFiap\Core\CasosUso\Admin\Login;
 use SecretariaFiap\Infra\Http\Middleware;
 use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
@@ -33,28 +33,17 @@ $app->addBodyParsingMiddleware();
 $app->addErrorMiddleware(true, true, true);
 
 $app->get('/', function (Request $request, Response $response) {
-    $response->getBody()->write('Hello World');
+    $response->getBody()->write(json_encode(["Ola3", getenv('TOKEN_SALT')]));
     return $response;
 });
-
-$app->get('/admin', function (Request $request, Response $response) {
-    $caso = $this->get(Login::class);
-
-    $input = SecretariaFiap\Core\CasosUso\Admin\InputObject::create([
-        'email' => 'admin@fiap.com.br',
-        'senha' => 'Admin@123'
-    ]);
-
-    $output = $caso->executar($input);
-
-    $_SESSION['jwt'] = $output->token;
-
-    $response->getBody()->write(json_encode([$output, $_SESSION]));
-    return $response;
-});
-
 
 $app->group('/api', function (RouteCollectorProxy $api) {
+    $api->post('/admin/login', AdminController::class . ":login");
+});
+
+$app->group('/api', function (RouteCollectorProxy $api) {
+    $api->post('/admin/logout', AdminController::class . ":logout");
+
     $api->get('/alunos', AlunoController::class . ":listar");
     $api->post('/alunos', AlunoController::class . ":cadastrar");
     $api->get('/alunos/{uuid}', AlunoController::class . ":obter");
@@ -70,57 +59,7 @@ $app->group('/api', function (RouteCollectorProxy $api) {
 
     $api->post('/matriculas', MatriculaController::class . ":matricularAluno");
 
-});//->add(Middleware::class);
+})->add(Middleware::class);
 
-
-$app->group('/api', function (RouteCollectorProxy $api) {
-    $api->post('/admin/login', AlunoController::class . ":loginAdmin");
-});
 
 $app->run();
-
-
-
-// Inicio: Testes dos CRUDs
-// --> Aluno
-
-// --> Turma
-
-// --> Matricula
-// $input = \SecretariaFiap\Core\CasosUso\Matricula\InputObject::create([
-//     'uuid_aluno' => '52f7b495-458d-11f0-a0d1-4208e9f4cc4d',
-//     'uuid_turma' => 'e2f52eb1-8fca-4de1-9d55-03eb24267f7f'
-// ]);
-
-// $casoUsoMatricula = new \SecretariaFiap\Core\CasosUso\Matricula\MatricularAluno(
-//     $repositorio,
-//     $repositorioTurma,
-//     $repositorioMatricula
-// );
-
-// $output = $casoUsoMatricula->executar($input);
-
-// render($output, "Matriculando Aluno");
-
-// --> Admin
-// use SecretariaFiap\Core\CasosUso\Admin\InputObject as AdminInput;
-
-// $login = new Login($repositorioAdmin);
-// $input = AdminInput::create([
-//     'email' => 'admin@fiap.com.br',
-//     'senha' => 'Admin@123'
-// ]);
-// $output = $login->executar($input);
-// render($output, "Login do Admin");
-
-// // Inicio: Testes dos CRUDs
-
-// function render($dados, $mensagem)
-// {
-//     if (!empty($mensagem))
-//         echo "<h3> -------- $mensagem -------- </h3>";
-//     echo "<pre>";
-//     print_r($dados);
-//     echo "</pre>";
-//     echo "<hr>";
-// }
