@@ -56,9 +56,9 @@ class OutputPaginacaoObject implements JsonSerializable
         $mappedItems = array_map(fn($item) => $item->toArray(), $this->itens);
 
         return [
-            'paginaAtual' => $this->paginaAtual,
-            'totalRegistros' => $this->totalRegistros,
-            'totalPaginas' => $this->totalPaginas,
+            'pagina_atual' => $this->paginaAtual,
+            'total_registros' => $this->totalRegistros,
+            'total_paginas' => $this->totalPaginas,
             'limite' => $this->limite,
             'itens' => $mappedItems,
         ];

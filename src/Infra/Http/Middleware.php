@@ -8,6 +8,7 @@ use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use SecretariaFiap\Helpers\TokenHelper;
 use Slim\Psr7\Response;
 
 class Middleware
@@ -25,11 +26,13 @@ class Middleware
                 throw new Exception('Token não informado.', 401);
             }
 
-            $tokenAdmin = $_SESSION['jwt'];
+            $payload = TokenHelper::decodificar($jwt);
 
-            if ($jwt !== $tokenAdmin) {
-                throw new Exception('Token inválido.', 401);
+            if (!$payload) {
+                throw new Exception('Token inválido ou expirado.', 401);
             }
+
+            $response = $handler->handle($request);
 
             return $response;
 

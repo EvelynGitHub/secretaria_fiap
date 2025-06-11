@@ -6,7 +6,7 @@ namespace SecretariaFiap\Core\CasosUso\Admin;
 
 use SecretariaFiap\Core\Contratos\Repositorio\AdminRepositorio;
 use Exception;
-use SecretariaFiap\Helpers\GeradorUuid;
+use SecretariaFiap\Helpers\TokenHelper;
 
 class Login
 {
@@ -32,7 +32,7 @@ class Login
         // Aqui poderia adicionar token JWT, refresh token ou outro mecanismo de autenticação
         // Para simplificar, foi feito simplesmente como abaixo
 
-        $token = GeradorUuid::gerar() . ":" . GeradorUuid::gerar();
+        $token = TokenHelper::gerar($admin->getEmail());
 
         return OutputObject::create([
             'uuid' => $admin->getUuid(),
