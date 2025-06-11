@@ -36,8 +36,9 @@ class HttpResposta
             $exception["file"] = $objError->getFile();
             $exception["line"] = $objError->getLine();
 
+            $codErro = $objError->getCode() == 0 ? 400 : $objError->getCode();
             $response->getBody()->write(json_encode($exception));
-            $response->withStatus($objError->getCode() ?? 400);
+            $response->withStatus($codErro);
 
             return $response;
         } catch (Throwable $th) {
@@ -46,8 +47,10 @@ class HttpResposta
             $exception["file"] = $th->getFile();
             $exception["line"] = $th->getLine();
 
+            $codErro = $th->getCode() == 0 ? 500 : $th->getCode();
+
             $response->getBody()->write(json_encode($exception));
-            $response->withStatus($objError->getCode() ?? 500);
+            $response->withStatus($codErro);
 
             return $response;
         }
