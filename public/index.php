@@ -5,18 +5,9 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use SecretariaFiap\Adapter\Controller\AlunoController;
+use SecretariaFiap\Adapter\Controller\MatriculaController;
+use SecretariaFiap\Adapter\Controller\TurmaController;
 use SecretariaFiap\Core\CasosUso\Admin\Login;
-use SecretariaFiap\Core\CasosUso\Aluno\Atualizar;
-use SecretariaFiap\Core\CasosUso\Aluno\Cadastrar;
-use SecretariaFiap\Core\CasosUso\Aluno\InputObject;
-use SecretariaFiap\Core\CasosUso\Aluno\Listar;
-use SecretariaFiap\Core\CasosUso\Aluno\ListarPorTurma;
-use SecretariaFiap\Core\CasosUso\Aluno\Obter;
-use SecretariaFiap\Core\CasosUso\Aluno\Remover;
-use SecretariaFiap\Core\Contratos\Repositorio\AdminRepositorio;
-use SecretariaFiap\Core\Contratos\Repositorio\AlunoRepositorio;
-use SecretariaFiap\Core\Contratos\Repositorio\MatriculaRepositorio;
-use SecretariaFiap\Core\Contratos\Repositorio\TurmaRepositorio;
 use SecretariaFiap\Infra\Http\Middleware;
 use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
@@ -24,6 +15,7 @@ use Slim\Routing\RouteCollectorProxy;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+session_start();
 
 header("Accept: application/json; charset=UTF-8"); //Aceita apenas coisas enviadas como JSON
 header("Content-Type: application/json; charset=UTF-8"); //tipo de retorno
@@ -37,7 +29,7 @@ AppFactory::setContainer($container);
 // Fim: Injeção de dependência 
 
 $app = AppFactory::create();
-
+$app->addBodyParsingMiddleware();
 $app->addErrorMiddleware(true, true, true);
 
 $app->get('/', function (Request $request, Response $response) {
@@ -45,49 +37,45 @@ $app->get('/', function (Request $request, Response $response) {
     return $response;
 });
 
-$app->get('/alunos', function (Request $request, Response $response) {
-    $response->getBody()->write('Alunos');
+$app->get('/admin', function (Request $request, Response $response) {
+    $caso = $this->get(Login::class);
+
+    $input = SecretariaFiap\Core\CasosUso\Admin\InputObject::create([
+        'email' => 'admin@fiap.com.br',
+        'senha' => 'Admin@123'
+    ]);
+
+    $output = $caso->executar($input);
+
+    $_SESSION['jwt'] = $output->token;
+
+    $response->getBody()->write(json_encode([$output, $_SESSION]));
     return $response;
 });
 
-// Add error middleware
 
 $app->group('/api', function (RouteCollectorProxy $api) {
-    //     $api->get('/baralho', BaralhoController::class . ':obterBaralhosUsuario')->add(Middleware::class);
-//     $api->get('/baralho/{uuid_baralho}', BaralhoController::class . ':obterBaralho')->add(Middleware::class);
-//     $api->put('/baralho/{uuid_baralho}', BaralhoController::class . ':atualizarBaralho')->add(Middleware::class);
-
-    // $api->get('/alunos', function ($request, $response, $args) {
-
-    //     $repositorio = $this->get(AlunoRepositorio::class);
-    //     $casoUso = new Cadastrar($repositorio);
-
-    //     $dados = $request->getParsedBody();
-    //     $input = InputObject::create($dados);
-    //     $output = $casoUso->executar($input);
-
-    //     $response->getBody()->write(json_encode($output));
-    //     return $response->withHeader('Content-Type', 'application/json');
-    // });
-
-
     $api->get('/alunos', AlunoController::class . ":listar");
+    $api->post('/alunos', AlunoController::class . ":cadastrar");
+    $api->get('/alunos/{uuid}', AlunoController::class . ":obter");
+    $api->put('/alunos/{uuid}', AlunoController::class . ":atualizar");
+    $api->delete('/alunos/{uuid}', AlunoController::class . ":remover");
+    $api->get('/alunos/turma/{uuid_turma}', AlunoController::class . ":listarPorTurma");
+
+    $api->post('/turmas', TurmaController::class . ":cadastrar");
+    $api->get('/turmas', TurmaController::class . ":listar");
+    $api->get('/turmas/{uuid}', TurmaController::class . ":obter");
+    $api->put('/turmas/{uuid}', TurmaController::class . ":atualizar");
+    $api->delete('/turmas/{uuid}', TurmaController::class . ":remover");
+
+    $api->post('/matriculas', MatriculaController::class . ":matricularAluno");
+
 });//->add(Middleware::class);
 
-// $api->get('/alunos', function ($request, $response, $args) {
 
-//     echo "Listando alunos...";
-
-//     $repositorio = $this->get(AlunoRepositorio::class);
-//     $casoUso = new Cadastrar($repositorio);
-
-//     $dados = $request->getParsedBody();
-//     $input = InputObject::create($dados);
-//     $output = $casoUso->executar($input);
-
-//     $response->getBody()->write(json_encode($output));
-//     return $response->withHeader('Content-Type', 'application/json');
-// });
+$app->group('/api', function (RouteCollectorProxy $api) {
+    $api->post('/admin/login', AlunoController::class . ":loginAdmin");
+});
 
 $app->run();
 
@@ -95,55 +83,6 @@ $app->run();
 
 // Inicio: Testes dos CRUDs
 // --> Aluno
-// $casoUsoCadastro = new Cadastrar($repositorio);
-
-// $input = InputObject::create([
-//     'nome' => 'João Silva DI',
-//     'cpf' => '22222222222',
-//     'email' => 'joao@exemplo.com.br',
-//     'senha' => 'SenhaSegura123!',
-//     'data_nascimento' => '1998-01-01'
-// ]);
-
-// $output = $casoUsoCadastro->executar($input);
-
-// render($output, "Cadastro de João");
-
-
-// $casoUsoObter = new Obter($repositorio);
-// $outputObter = $casoUsoObter->executar($output->uuid);
-// render($outputObter, "Obtendo dados do João");
-
-
-// $edit = InputObject::create([
-//     'nome' => $outputObter->nome . " Editado",
-//     'cpf' => $outputObter->cpf,
-//     'email' => $outputObter->email,
-//     // 'senha' => "Abc123@@",
-//     'data_nascimento' => $output->dataNascimento,
-//     'uuid' => $outputObter->uuid
-// ]);
-// $casoUsoEditar = new Atualizar($repositorio);
-// $outputObter = $casoUsoEditar->executar($edit);
-// render($outputObter, "Atualizando dados do João");
-
-
-// $casoUsoListar = new Listar($repositorio);
-// $outputLista = $casoUsoListar->executar();
-// render($outputLista, "Listando dados de aluno");
-
-
-// $casoUsoRemover = new Remover($repositorio);
-// $outputRemove = $casoUsoRemover->executar($output->uuid);
-// render($outputRemove, "Removendo dados do João");
-
-// 3e4d1dca-6d7c-4869-91af-411c21350b40 - Turma sem alunos
-// e2f52eb1-8fca-4de1-9d55-03eb24267f7f - Turma com alunos
-// $casoUsoListarAlunosPorTurma = new ListarPorTurma($repositorio);
-// $outputRemove = $casoUsoListarAlunosPorTurma->executar('e2f52eb1-8fca-4de1-9d55-03eb24267f7f');
-// render($outputRemove, "Alunos por Turma");
-
-
 
 // --> Turma
 // $casoUsoCadastroT = new \SecretariaFiap\Core\CasosUso\Turma\Cadastrar($repositorioTurma);

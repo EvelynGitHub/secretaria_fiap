@@ -34,7 +34,7 @@ class Senha
             !preg_match('/[0-9]/', $senha) ||
             !preg_match('/[\W]/', $senha)
         ) {
-            throw new \InvalidArgumentException("Senha fraca.");
+            throw new \InvalidArgumentException("Senha fraca.", 400);
         }
     }
 

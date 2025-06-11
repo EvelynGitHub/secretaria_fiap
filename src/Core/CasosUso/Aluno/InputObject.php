@@ -20,11 +20,11 @@ class InputObject
     private function __construct(array $values)
     {
         $this->uuid = $values['uuid'] ?? null;
-        $this->nome = $values['nome'] ?? throw new \InvalidArgumentException("Nome é obrigatório.");
-        $this->cpf = $values['cpf'] ?? throw new \InvalidArgumentException("CPF é obrigatório.");
-        $this->email = $values['email'] ?? throw new \InvalidArgumentException("Email é obrigatório.");
-        $this->dataNascimento = $values['data_nascimento'] ?? throw new \InvalidArgumentException("Data de Nascimento é obrigatória.");
-        $this->senha = $values['senha'] ?? null;
+        $this->nome = $values['nome'] ?? throw new \InvalidArgumentException("Nome é obrigatório.", 400);
+        $this->cpf = $values['cpf'] ?: throw new \InvalidArgumentException("CPF é obrigatório.", 400);
+        $this->email = $values['email'] ?: throw new \InvalidArgumentException("Email é obrigatório.", 400);
+        $this->dataNascimento = $values['data_nascimento'] ?: throw new \InvalidArgumentException("Data de Nascimento é obrigatória.", 400);
+        $this->senha = $values['senha'] ?? '';
     }
 
     public static function create(array $data): InputObject

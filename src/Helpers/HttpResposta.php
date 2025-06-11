@@ -37,7 +37,7 @@ class HttpResposta
             $exception["line"] = $objError->getLine();
 
             $response->getBody()->write(json_encode($exception));
-            $response->withStatus($objError->getCode());
+            $response->withStatus($objError->getCode() ?? 400);
 
             return $response;
         } catch (Throwable $th) {
@@ -47,7 +47,7 @@ class HttpResposta
             $exception["line"] = $th->getLine();
 
             $response->getBody()->write(json_encode($exception));
-            $response->withStatus($objError->getCode());
+            $response->withStatus($objError->getCode() ?? 500);
 
             return $response;
         }
