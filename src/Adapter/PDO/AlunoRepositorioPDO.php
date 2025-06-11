@@ -97,7 +97,10 @@ class AlunoRepositorioPDO implements AlunoRepositorio
     public function listarPorFiltros(string $nome, int $offset = 0, int $limit = 10): Paginacao
     {
         // 1. Consulta para obter os dados da página atual
-        $sqlDados = "SELECT * FROM alunos WHERE nome LIKE :nome LIMIT :offset, :limit";
+        $sqlDados = "SELECT * FROM alunos 
+            WHERE nome LIKE :nome 
+            ORDER BY alunos.nome ASC 
+            LIMIT :offset, :limit ";
         $stmtDados = $this->pdo->prepare($sqlDados);
         $stmtDados->bindValue(':nome', "%{$nome}%");
         $stmtDados->bindValue(':limit', $limit, PDO::PARAM_INT);
@@ -110,7 +113,7 @@ class AlunoRepositorioPDO implements AlunoRepositorio
         }
 
         // 2. Consulta separada para obter o total de registros
-        $sqlTotal = "SELECT COUNT(id) FROM alunos WHERE nome LIKE :nome";
+        $sqlTotal = "SELECT COUNT(id) FROM alunos WHERE nome LIKE :nome ";
         $stmtTotal = $this->pdo->prepare($sqlTotal);
         $stmtTotal->bindValue(':nome', "%{$nome}%");
         $stmtTotal->execute();
@@ -144,6 +147,7 @@ class AlunoRepositorioPDO implements AlunoRepositorio
             JOIN matriculas ON alunos.id = matriculas.aluno_id 
             JOIN turmas ON matriculas.turma_id = turmas.id 
             WHERE turmas.uuid = :uuidTurma
+            ORDER BY alunos.nome ASC
             LIMIT :offset, :limit";
 
         $stmtDados = $this->pdo->prepare($sqlDados);
@@ -162,7 +166,8 @@ class AlunoRepositorioPDO implements AlunoRepositorio
             FROM alunos 
             JOIN matriculas ON alunos.id = matriculas.aluno_id 
             JOIN turmas ON matriculas.turma_id = turmas.id 
-            WHERE turmas.uuid = :uuidTurma";
+            WHERE turmas.uuid = :uuidTurma
+            ORDER BY alunos.nome ASC";
         $stmtTotal = $this->pdo->prepare($sqlTotal);
         $stmtTotal->bindValue(':uuidTurma', $uuidTurma);
         $stmtTotal->execute();
