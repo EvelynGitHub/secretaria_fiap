@@ -19,11 +19,31 @@ class DocController
      * @OA\SecurityScheme(
      *      securityScheme="bearerAuth",
      *      type="http",
-     *      description="Autenticação JWT com token Bearer",
+     *      description="Autenticação JWT com token Bearer. Muita atenção para não colocar caracteres a mais ou a menos para o token.",
      *      scheme="bearer",
      *      bearerFormat="JWT"
      * )
      * 
+     */
+    public $token;
+
+    /**
+     * @OA\Tag(
+     *      name="Admin",
+     *      description="Operações e recursos de administração do sistema."
+     * )
+     * @OA\Tag(
+     *      name="Aluno",
+     *      description="Operações relacionadas à gestão de alunos, incluindo listagem, criação e atualização."
+     * )
+     * @OA\Tag(
+     *      name="Turma",
+     *      description="Gerenciamento de turmas, suas informações e alunos associados."
+     * )
+     * @OA\Tag(
+     *      name="Matricula",
+     *      description="Gerenciamento de matrículas de alunos em turmas, incluindo status e histórico."
+     * )
      */
     public $tags;
 
@@ -379,14 +399,33 @@ class DocController
      *      title="Dados de Saída da Matrícula",
      *      description="Estrutura de uma matrícula retornada pela API.",
      *      type="object",
-     *      @OA\Property(property="uuid", type="string", format="uuid", example="f0e9d8c7-b6a5-4321-fedc-ba9876543210"),
-     *      @OA\Property(property="uuid_aluno", type="string", format="uuid", example="52f7b495-458d-11f0-a0d1-4208e9f4cc4d"),
-     *      @OA\Property(property="uuid_turma", type="string", format="uuid", example="a1b2c3d4-e5f6-7890-1234-567890abcdef"),
-     *      @OA\Property(property="data_matricula", type="string", format="date-time", example="2025-06-11T10:00:00Z"),
-     *      @OA\Property(property="status", type="string", example="ATIVA", enum={"ATIVA", "CONCLUIDA", "CANCELADA"})
+     *      @OA\Property(property="mensagem", type="string", format="mensagem", example="Matricula realizada")
      * )
      */
     public $esquemaMatricula;
+
+    /**
+     * @OA\Schema(
+     *      schema="AdminLoginInput",
+     *      title="Credenciais de Login do Admin",
+     *      description="Estrutura para as credenciais de autenticação de um administrador.",
+     *      type="object",
+     *      required={"email", "senha"},
+     *      @OA\Property(property="email", type="string", format="email", example="admin@fiap.com.br"),
+     *      @OA\Property(property="senha", type="string", format="password", example="Admin@123")
+     * ),
+     * 
+     * @OA\Schema(
+     *      schema="AdminLoginResponse",
+     *      title="Resposta de Login do Admin",
+     *      description="Estrutura da resposta após um login de administrador bem-sucedido, incluindo o token JWT.",
+     *      type="object",
+     *      @OA\Property(property="uuid", type="string", format="uuid", example="a1b2c3d4-e5f6-7890-1234-0987654321ab", description="UUID do administrador logado."),
+     *      @OA\Property(property="nome", type="string", example="Administrador Fiap", description="Nome completo do administrador."),
+     *      @OA\Property(property="token", type="string", example="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFkbWluIiwiYWRtaW4iOnRydWV9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c", description="Token JWT para autenticação em requisições futuras.")
+     * )
+     */
+    public $esquemaAdmin;
 
     // --- POST /turmas ---
     /**
@@ -569,5 +608,95 @@ class DocController
      */
     public $removerTurma;
 
+    /**
+     * @OA\Post(
+     *      path="/matriculas",
+     *      summary="Matricula um aluno em uma turma",
+     *      tags={"Matricula"},
+     *      @OA\RequestBody(
+     *          description="Dados da matrícula a ser criada",
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/MatriculaInput")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Aluno matriculado com sucesso.",
+     *          @OA\JsonContent(ref="#/components/schemas/MatriculaOutput")
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Requisição inválida (dados faltando, aluno ou turma não encontrados, ou aluno já matriculado).",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Aluno ou Turma não encontrados.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erro interno do servidor.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      )
+     * )
+     */
+    public $matricularAluno;
+
+
+
+    /**
+     * @OA\Post(
+     *      path="/admin/login",
+     *      summary="Autentica um administrador e retorna um token JWT",
+     *      tags={"Admin"},
+     *      @OA\RequestBody(
+     *          description="Credenciais (email e senha) do administrador para login. As de exemplo já são validas.",
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/AdminLoginInput")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Login de administrador bem-sucedido. Retorna o token JWT e dados do admin.",
+     *          @OA\JsonContent(ref="#/components/schemas/AdminLoginResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Credenciais de administrador inválidas (email ou senha incorretos).",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erro interno do servidor ao tentar autenticar o administrador.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      )
+     * )
+     */
+    public $login;
+
+    /**
+     * @OA\Post(
+     *      path="/admin/logout",
+     *      summary="Invalida o token JWT",
+     *      tags={"Admin"},
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Logout de administrador bem-sucedido.",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="mensagem", 
+     *                type="string",
+     *                format="mensagem",
+     *                example="Logout efetuado com sucesso.")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erro interno do servidor.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      )
+     * )
+     */
+    public $logout;
 
 }

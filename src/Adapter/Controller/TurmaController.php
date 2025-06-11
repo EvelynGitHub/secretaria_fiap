@@ -111,7 +111,7 @@ class TurmaController
 
             $output = $this->casoUsoRemover->executar($uuid);
 
-            return HttpResposta::sucesso($output, 200);
+            return HttpResposta::sucesso($output, 204);
         } catch (\Throwable $th) {
             return HttpResposta::erro($th);
         }
