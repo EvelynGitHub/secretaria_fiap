@@ -319,5 +319,255 @@ class DocController
      */
     public $listarAlunoPorTurma;
 
+    // --- Definições de Schemas (Modelos de Dados) para Aluno ---
+
+    /**
+     * @OA\Schema(
+     *      schema="TurmaInput",
+     *      title="Dados de Entrada da Turma",
+     *      description="Estrutura para criação e atualização de uma turma.",
+     *      type="object",
+     *      required={"nome", "descricao"},
+     *      @OA\Property(property="nome", type="string", example="Matemática Avançada"),
+     *      @OA\Property(property="descricao", type="integer", example="Matemática Avançada para IA", description="descricao letivo da turma")
+     * ),
+     * 
+     * @OA\Schema(
+     *      schema="TurmaOutput",
+     *      title="Dados de Saída da Turma",
+     *      description="Estrutura de uma turma retornada pela API.",
+     *      type="object",
+     *      @OA\Property(property="uuid", type="string", format="uuid", example="a1b2c3d4-e5f6-7890-1234-567890abcdef"),
+     *      @OA\Property(property="nome", type="string", example="Matemática Avançada"),
+     *      @OA\Property(property="descricao", type="integer", example="Matemática Avançada para IA")
+     * ),
+     * 
+     * @OA\Schema(
+     *      schema="TurmaListagemResponse",
+     *      title="Resposta de Listagem de Turmas Paginada",
+     *      description="Estrutura da resposta para listagem paginada de turmas.",
+     *      type="object",
+     *      allOf={
+     *          @OA\Schema(ref="#/components/schemas/PaginacaoMeta"),
+     *          @OA\Schema(
+     *              properties={
+     *                  @OA\Property(
+     *                      property="itens",
+     *                      type="array",
+     *                      @OA\Items(ref="#/components/schemas/TurmaOutput")
+     *                  )
+     *              }
+     *          )
+     *      }
+     * )
+     */
+    public $esquemaTurma;
+
+
+    /**
+     * @OA\Schema(
+     *      schema="MatriculaInput",
+     *      title="Dados de Entrada da Matrícula",
+     *      description="Estrutura para matricular um aluno em uma turma.",
+     *      type="object",
+     *      required={"uuid_aluno", "uuid_turma"},
+     *      @OA\Property(property="uuid_aluno", type="string", format="uuid", example="52f7b495-458d-11f0-a0d1-4208e9f4cc4d", description="UUID do aluno a ser matriculado"),
+     *      @OA\Property(property="uuid_turma", type="string", format="uuid", example="a1b2c3d4-e5f6-7890-1234-567890abcdef", description="UUID da turma onde o aluno será matriculado")
+     * ),
+     * @OA\Schema(
+     *      schema="MatriculaOutput",
+     *      title="Dados de Saída da Matrícula",
+     *      description="Estrutura de uma matrícula retornada pela API.",
+     *      type="object",
+     *      @OA\Property(property="uuid", type="string", format="uuid", example="f0e9d8c7-b6a5-4321-fedc-ba9876543210"),
+     *      @OA\Property(property="uuid_aluno", type="string", format="uuid", example="52f7b495-458d-11f0-a0d1-4208e9f4cc4d"),
+     *      @OA\Property(property="uuid_turma", type="string", format="uuid", example="a1b2c3d4-e5f6-7890-1234-567890abcdef"),
+     *      @OA\Property(property="data_matricula", type="string", format="date-time", example="2025-06-11T10:00:00Z"),
+     *      @OA\Property(property="status", type="string", example="ATIVA", enum={"ATIVA", "CONCLUIDA", "CANCELADA"})
+     * )
+     */
+    public $esquemaMatricula;
+
+    // --- POST /turmas ---
+    /**
+     * @OA\Post(
+     *      path="/turmas",
+     *      summary="Cadastra uma nova turma",
+     *      tags={"Turma"},
+     *      security={{"bearerAuth": {}}},
+     *      @OA\RequestBody(
+     *          description="Dados da turma a ser cadastrada",
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/TurmaInput")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Turma cadastrada com sucesso.",
+     *          @OA\JsonContent(ref="#/components/schemas/TurmaOutput")
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Requisição inválida (dados faltando ou em formato incorreto).",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erro interno do servidor.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      )
+     * )
+     */
+    public $cadastrarTurma;
+
+    // --- GET /turmas ---
+    /**
+     * @OA\Get(
+     *      path="/turmas",
+     *      summary="Lista todas as turmas com filtros e paginação",
+     *      tags={"Turma"},
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Parameter(
+     *          name="nome",
+     *          in="query",
+     *          description="Filtra turmas por nome (suporta busca parcial).",
+     *          required=false,
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Parameter(
+     *          name="offset",
+     *          in="query",
+     *          description="Deslocamento para a paginação (início dos resultados).",
+     *          required=false,
+     *          @OA\Schema(type="integer", default=0)
+     *      ),
+     *      @OA\Parameter(
+     *          name="limit",
+     *          in="query",
+     *          description="Número máximo de registros por página.",
+     *          required=false,
+     *          @OA\Schema(type="integer", default=10)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Lista de turmas paginada com sucesso.",
+     *          @OA\JsonContent(ref="#/components/schemas/TurmaListagemResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erro interno do servidor.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      )
+     * )
+     */
+    public $listarTurma;
+
+    // --- GET /turmas/{uuid} ---
+    /**
+     * @OA\Get(
+     *      path="/turmas/{uuid}",
+     *      summary="Obtém os detalhes de uma turma específica por UUID",
+     *      tags={"Turma"},
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Parameter(
+     *          name="uuid",
+     *          in="path",
+     *          description="UUID da turma a ser obtida.",
+     *          required=true,
+     *          @OA\Schema(type="string", format="uuid")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Detalhes da turma.",
+     *          @OA\JsonContent(ref="#/components/schemas/TurmaOutput")
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Turma não encontrada.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erro interno do servidor.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      )
+     * )
+     */
+    public $obterTurmas;
+
+    // --- PUT /turmas/{uuid} ---
+    /**
+     * @OA\Put(
+     *      path="/turmas/{uuid}",
+     *      summary="Atualiza as informações de uma turma existente",
+     *      tags={"Turma"},
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Parameter(
+     *          name="uuid",
+     *          in="path",
+     *          description="UUID da turma a ser atualizada.",
+     *          required=true,
+     *          @OA\Schema(type="string", format="uuid")
+     *      ),
+     *      @OA\RequestBody(
+     *          description="Dados da turma a serem atualizados",
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/TurmaInput")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Turma atualizada com sucesso.",
+     *          @OA\JsonContent(ref="#/components/schemas/TurmaOutput")
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Requisição inválida.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Turma não encontrada.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erro interno do servidor.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      )
+     * )
+     */
+    public $atualizarTurma;
+
+    // --- DELETE /turmas/{uuid} ---
+    /**
+     * @OA\Delete(
+     *      path="/turmas/{uuid}",
+     *      summary="Remove uma turma específica por UUID",
+     *      tags={"Turma"},
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Parameter(
+     *          name="uuid",
+     *          in="path",
+     *          description="UUID da turma a ser removida.",
+     *          required=true,
+     *          @OA\Schema(type="string", format="uuid")
+     *      ),
+     *      @OA\Response(
+     *          response=204,
+     *          description="Turma removida com sucesso (Sem Conteúdo)."
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Turma não encontrada.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erro interno do servidor.",
+     *          @OA\JsonContent(ref="#/components/schemas/ErroResponse")
+     *      )
+     * )
+     */
+    public $removerTurma;
+
 
 }
