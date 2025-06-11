@@ -84,7 +84,10 @@ class TurmaRepositorioPDO implements TurmaRepositorio
     public function listarPorFiltros(string $nome, int $offset = 0, int $limit = 10): Paginacao
     {
         // 1. Consulta para obter os dados da página atual
-        $sqlDados = "SELECT * FROM turmas WHERE nome LIKE :nome LIMIT :offset, :limit";
+        $sqlDados = "SELECT * FROM turmas 
+            WHERE nome LIKE :nome 
+            ORDER BY turmas.nome ASC 
+            LIMIT :offset, :limit";
         $stmtDados = $this->pdo->prepare($sqlDados);
         $stmtDados->bindValue(':nome', "%{$nome}%");
         $stmtDados->bindValue(':limit', $limit, PDO::PARAM_INT);
