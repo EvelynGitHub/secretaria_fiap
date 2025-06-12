@@ -80,7 +80,8 @@ class AdminController
                 throw new Exception('Token não informado.', 401);
             }
 
-            TokenHelper::adicionarTokenBlacklist($jwt);
+            // Comentado devido ao HttpOnly estar funcionando (e isso tem problemas de permissão)
+            // TokenHelper::adicionarTokenBlacklist($jwt);
 
             // Invalida o cookie 'auth_token' definindo sua data de expiração no passado
             // As flags (Path, HttpOnly, Secure, SameSite) devem ser as mesmas do cookie original
