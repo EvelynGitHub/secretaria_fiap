@@ -30,9 +30,23 @@ class AdminController
 
             $output = $this->casoUsoLogin->executar($input);
 
-            $_SESSION['jwt'] = $output->token;
+            // JWT HttpOnly
+            $response = $response->withHeader('Set-Cookie', 'auth_token=' . $output->token . '; Path=/; HttpOnly; SameSite=Lax');
 
-            return HttpResposta::sucesso($output, 200);
+            // Para poder testar pelo swagger também
+            $response->getBody()->write(json_encode($output));
+            $response->withStatus(200);
+            return $response;//->withJson(['success' => true, 'message' => 'Login bem-sucedido!']);
+
+            // JWT HttpOnly - EXPLICAÇÃO DAS LINHAS
+            // Configura o cookie 'auth_token' com o token JWT
+            // Path=/      : O cookie estará disponível para todo o domínio
+            // HttpOnly    : O cookie não pode ser acessado via JavaScript (segurança XSS)
+            // Secure      : O cookie SÓ será enviado se a conexão for HTTPS (ESSENCIAL PARA PRODUÇÃO) (REMOVIDO POR NÃO SER PRODUÇÃO)
+            // SameSite=Lax: Protege contra CSRF (pode ser 'Strict' para mais segurança, mas pode impactar links externos)
+            // $response = $response->withHeader('Set-Cookie', 'auth_token=' . $output->token . '; Path=/; HttpOnly; Secure; SameSite=Lax');
+            // Retorna a resposta de sucesso, sem o token no corpo do JSON, pois ele está no cookie
+            // O corpo da resposta pode ser vazio ou conter apenas uma mensagem de sucesso
         } catch (\Throwable $th) {
             return HttpResposta::erro($th);
         }
@@ -54,13 +68,27 @@ class AdminController
 
             $jwt = explode(' ', $httpHeader)[1] ?? null;
 
+            // Tenta obter pelo Authorization (para o swagger), se não conseguir tenta pelos cookies
+            if (empty($jwt)) {
+                // 1. Obter os cookies da requisição
+                $cookies = $request->getCookieParams();
+                // 2. Extrair o token JWT do cookie 'auth_token'
+                $jwt = $cookies['auth_token'] ?? null;
+            }
+
             if (is_null($jwt)) {
                 throw new Exception('Token não informado.', 401);
             }
 
             TokenHelper::adicionarTokenBlacklist($jwt);
 
-            return HttpResposta::sucesso(["mensagem" => "Logout efetuado com sucesso."], 200);
+            // Invalida o cookie 'auth_token' definindo sua data de expiração no passado
+            // As flags (Path, HttpOnly, Secure, SameSite) devem ser as mesmas do cookie original
+            $response = $response->withHeader('Set-Cookie', 'auth_token=; Path=/; HttpOnly; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax');
+
+            $response->getBody()->write(json_encode(["mensagem" => "Logout efetuado com sucesso."]));
+            $response->withStatus(200);
+            return $response;
         } catch (\Throwable $th) {
             return HttpResposta::erro($th);
         }

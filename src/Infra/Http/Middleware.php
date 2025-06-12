@@ -22,6 +22,14 @@ class Middleware
 
             $jwt = explode(' ', $httpHeader)[1] ?? null;
 
+            // Tenta obter pelo Authorization (para o swagger), se não conseguir tenta pelos cookies
+            if (empty($jwt)) {
+                // 1. Obter os cookies da requisição
+                $cookies = $request->getCookieParams();
+                // 2. Extrair o token JWT do cookie 'auth_token'
+                $jwt = $cookies['auth_token'] ?? null;
+            }
+
             if (is_null($jwt)) {
                 throw new Exception('Token não informado.', 401);
             }
