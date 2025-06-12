@@ -41,7 +41,7 @@ $(document).ready(function () {
                 const parsed = JSON.parse(rawResponse);
 
                 const response = {
-                    draw: parseInt(parsed.pagina_atual || 1),
+                    draw: currentDraw,
                     recordsTotal: parsed.total_registros,
                     recordsFiltered: parsed.total_registros,
                     data: parsed.itens
