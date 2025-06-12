@@ -44,7 +44,7 @@ class AlunoRepositorioPDO implements AlunoRepositorio
 
     public function editar(Aluno $aluno): bool
     {
-        $sql = "UPDATE alunos SET nome = :nome, email = :email, senha_hash = :senha, data_nascimento = :nascimento 
+        $sql = "UPDATE alunos SET nome = :nome, email = :email, senha_hash = :senha, data_nascimento = :nascimento, cpf = :cpf 
                 WHERE uuid = :uuid";
         try {
             $stmt = $this->pdo->prepare($sql);
@@ -52,6 +52,7 @@ class AlunoRepositorioPDO implements AlunoRepositorio
                 ':nome' => $aluno->getNome(),
                 ':email' => $aluno->getEmail(),
                 ':senha' => $aluno->getSenha(),
+                ':cpf' => $aluno->getCpf(),
                 ':nascimento' => $aluno->getDataNascimento()->format('Y-m-d'),
                 ':uuid' => $aluno->getUuid(),
             ]);

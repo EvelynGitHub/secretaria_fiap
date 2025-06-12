@@ -13,6 +13,11 @@ class Conexao
 
     public static function obter(): PDO
     {
+        // Se eu tivesse começa pelos Testes não precisaria desse if 
+        if (php_sapi_name() === 'cli' && isset($GLOBALS['__pdo_test__'])) {
+            return $GLOBALS['__pdo_test__'];
+        }
+
         if (self::$pdo === null) {
             $host = getenv('DB_HOST') ?: 'mysql';
             $dbname = getenv('DB_NAME') ?: 'example_fiap';

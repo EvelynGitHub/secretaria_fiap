@@ -10,6 +10,7 @@ class Turma
     private string $uuid;
     private string $nome;
     private string $descricao;
+    private int $qtdAlunos = 0;
 
     public function __construct(
         string $nome,
@@ -57,5 +58,15 @@ class Turma
     public function getDescricao(): string
     {
         return $this->descricao;
+    }
+
+    public function setQtdAlunos(int $qtdAlunos): void
+    {
+        $this->qtdAlunos = $qtdAlunos;
+    }
+
+    public function getQtdAlunos(): int
+    {
+        return $this->qtdAlunos;
     }
 }

@@ -25,7 +25,8 @@ class Listar
             OutputObject::create([
                 'uuid' => $turma->getUuid(),
                 'nome' => $turma->getNome(),
-                'descricao' => $turma->getDescricao()
+                'descricao' => $turma->getDescricao(),
+                'qtd_alunos' => $turma->getQtdAlunos()
             ]);
 
         return OutputPaginacaoObject::create($turmasPaginadas, $mapper);

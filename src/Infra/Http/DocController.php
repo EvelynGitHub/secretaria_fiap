@@ -359,7 +359,8 @@ class DocController
      *      type="object",
      *      @OA\Property(property="uuid", type="string", format="uuid", example="a1b2c3d4-e5f6-7890-1234-567890abcdef"),
      *      @OA\Property(property="nome", type="string", example="Matemática Avançada"),
-     *      @OA\Property(property="descricao", type="integer", example="Matemática Avançada para IA")
+     *      @OA\Property(property="descricao", type="string", example="Matemática Avançada para IA"),
+     *      @OA\Property(property="qtd_alunos", type="integer", example=1)
      * ),
      * 
      * @OA\Schema(

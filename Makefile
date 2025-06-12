@@ -29,6 +29,10 @@ restart: down up
 artisan:
 	$(EXEC_PHP) php artisan $(filter-out $@,$(MAKECMDGOALS))
 
+
 # Composer
 test:
-	$(EXEC_PHP) ./vendor/bin/phpunit
+	$(EXEC_PHP) ./vendor/bin/phpunit tests --colors
+
+composer-install:
+	$(EXEC_PHP) composer install

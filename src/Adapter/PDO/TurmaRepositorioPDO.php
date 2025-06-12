@@ -84,9 +84,18 @@ class TurmaRepositorioPDO implements TurmaRepositorio
     public function listarPorFiltros(string $nome, int $offset = 0, int $limit = 10): Paginacao
     {
         // 1. Consulta para obter os dados da página atual
-        $sqlDados = "SELECT * FROM turmas 
-            WHERE nome LIKE :nome 
-            ORDER BY turmas.nome ASC 
+        $sqlDados = "SELECT
+                t.id,
+                t.uuid ,
+                t.nome,
+                t.descricao ,
+                COUNT(a.uuid) AS qtd_alunos
+            FROM turmas t
+            LEFT JOIN matriculas m ON m.turma_id = t.id 
+            LEFT JOIN alunos a ON m.aluno_id = a.id
+            WHERE t.nome LIKE :nome
+            GROUP BY t.id, t.uuid, t.nome, t.descricao 
+            ORDER BY t.nome ASC
             LIMIT :offset, :limit";
         $stmtDados = $this->pdo->prepare($sqlDados);
         $stmtDados->bindValue(':nome', "%{$nome}%");
@@ -126,6 +135,7 @@ class TurmaRepositorioPDO implements TurmaRepositorio
             $dados['uuid']
         );
         $turma->setId((int) $dados['id']);
+        $turma->setQtdAlunos((int) $dados['qtd_alunos']);
         return $turma;
     }
 }
