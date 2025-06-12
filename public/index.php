@@ -100,16 +100,27 @@ $app->group('', function (RouteCollectorProxy $group) {
         ob_start();
         include __DIR__ . '/views/alunos/cadastro.php';
         $content = ob_get_clean();
-        $response->getBody()->write($content);
+
+        ob_start();
+        include __DIR__ . '/views/layout.php';
+        $finalOutput = ob_get_clean();
+
+        $response->getBody()->write($finalOutput);
         return $response->withHeader('Content-Type', 'text/html');
     });
 
-    $group->get('/alunos/edicao/{id}', function (Request $request, Response $response, array $args) {
-        $id = $args['id'];
+    $group->get('/alunos/edicao/{uuid}', function (Request $request, Response $response, array $args) {
+        $uuid = $args['uuid'];
         ob_start();
         include __DIR__ . '/views/alunos/edicao.php';
         $content = ob_get_clean();
-        return $response;
+
+        ob_start();
+        include __DIR__ . '/views/layout.php';
+        $finalOutput = ob_get_clean();
+
+        $response->getBody()->write($finalOutput);
+        return $response->withHeader('Content-Type', 'text/html');
     });
 
     // ... Outras rotas do frontend (turmas, matrículas, etc.)

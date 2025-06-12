@@ -10,7 +10,7 @@ ob_start();
 <table id="alunosTable" class="table table-striped table-bordered" style="width:100%">
     <thead>
         <tr>
-            <th>ID</th>
+            <th>CPF</th>
             <th>Nome</th>
             <th>Email</th>
             <th>Data de Nascimento</th>
