@@ -9,6 +9,8 @@ ob_start();
     <p>Utilize a barra de navegação acima para acessar as funcionalidades.</p>
     <a class="btn btn-primary btn-lg" href="/alunos" role="button">Gerenciar Alunos</a>
     <a class="btn btn-primary btn-lg" href="/doc" role="button">Documentação da API</a>
+    <p>Devido a precessa no desenvolvimento do frontend, o mesmo se encontra instável as vezes. Recomendo executar os
+        teste pela documentação da API.</p>
 </div>
 <?php
 $content = ob_get_clean();

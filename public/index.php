@@ -57,70 +57,73 @@ $app->get('/', function (Request $request, Response $response) {
     return $response->withHeader('Location', '/login')->withStatus(302);
 });
 
-// Rotas Frontend que renderizam as views
-
-$app->get('/login', function (Request $request, Response $response, array $args) {
+function renderizarView(Response $response, string $viewPath, ?string $layoutPath = null, array $dados = []): Response
+{
+    extract($dados); // torna cada chave do array uma variável
     ob_start();
-    include __DIR__ . '/views/login.php'; // Inclui apenas o formulário de login
+    include $viewPath;
     $content = ob_get_clean();
 
-    // Passa o conteúdo do login.php para o layout_login.php
-    // e renderiza o layout completo
-    ob_start();
-    include __DIR__ . '/views/layout_login.php';
-    $finalOutput = ob_get_clean();
+    if ($layoutPath) {
+        // Define $content como variável usada no layout
+        ob_start();
+        include $layoutPath;
+        $finalOutput = ob_get_clean();
+    } else {
+        $finalOutput = $content;
+    }
 
     $response->getBody()->write($finalOutput);
     return $response->withHeader('Content-Type', 'text/html');
+}
+
+// Rotas Frontend que renderizam as views
+
+$app->get('/login', function (Request $request, Response $response, array $args) {
+    return renderizarView($response, __DIR__ . '/views/login.php', __DIR__ . '/views/layout_login.php');
 });
 
 
 // Grupo de rotas protegidas
 $app->group('', function (RouteCollectorProxy $group) {
     $group->get('/dashboard', function (Request $request, Response $response, array $args) {
-        ob_start();
-        include __DIR__ . '/views/dashboard.php';
-        $content = ob_get_clean();
-        // O dashboard.php já inclui o layout.php, então a renderização acontece lá
-
-        $response->getBody()->write($content);
-        return $response->withHeader('Content-Type', 'text/html');
+        return renderizarView($response, __DIR__ . '/views/dashboard.php');
     });
 
+    // Alunos
     $group->get('/alunos', function (Request $request, Response $response, array $args) {
-        ob_start();
-        include __DIR__ . '/views/alunos/listagem.php';
-        $content = ob_get_clean();
-        // O listagem.php já inclui o layout.php
-        $response->getBody()->write($content);
-        return $response->withHeader('Content-Type', 'text/html');
+        return renderizarView($response, __DIR__ . '/views/alunos/listagem.php');
     });
 
     $group->get('/alunos/cadastro', function (Request $request, Response $response, array $args) {
-        ob_start();
-        include __DIR__ . '/views/alunos/cadastro.php';
-        $content = ob_get_clean();
-
-        ob_start();
-        include __DIR__ . '/views/layout.php';
-        $finalOutput = ob_get_clean();
-
-        $response->getBody()->write($finalOutput);
-        return $response->withHeader('Content-Type', 'text/html');
+        return renderizarView($response, __DIR__ . '/views/alunos/cadastro.php', __DIR__ . '/views/layout.php');
     });
 
     $group->get('/alunos/edicao/{uuid}', function (Request $request, Response $response, array $args) {
-        $uuid = $args['uuid'];
-        ob_start();
-        include __DIR__ . '/views/alunos/edicao.php';
-        $content = ob_get_clean();
+        return renderizarView(
+            $response,
+            __DIR__ . '/views/alunos/edicao.php',
+            __DIR__ . '/views/layout.php',
+            ['uuid' => $args['uuid']] // <- torna $uuid acessível na view
+        );
+    });
 
-        ob_start();
-        include __DIR__ . '/views/layout.php';
-        $finalOutput = ob_get_clean();
+    // Turmas
+    $group->get('/turmas', function (Request $request, Response $response, array $args) {
+        return renderizarView($response, __DIR__ . '/views/turmas/listagem.php');
+    });
 
-        $response->getBody()->write($finalOutput);
-        return $response->withHeader('Content-Type', 'text/html');
+    $group->get('/turmas/cadastro', function (Request $request, Response $response, array $args) {
+        return renderizarView($response, __DIR__ . '/views/turmas/cadastro.php', __DIR__ . '/views/layout.php');
+    });
+
+    $group->get('/turmas/edicao/{uuid}', function (Request $request, Response $response, array $args) {
+        return renderizarView(
+            $response,
+            __DIR__ . '/views/turmas/edicao.php',
+            __DIR__ . '/views/layout.php',
+            ['uuid' => $args['uuid']] // <- torna $uuid acessível na view
+        );
     });
 
     // ... Outras rotas do frontend (turmas, matrículas, etc.)

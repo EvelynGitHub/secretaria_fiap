@@ -135,7 +135,8 @@ class TurmaRepositorioPDO implements TurmaRepositorio
             $dados['uuid']
         );
         $turma->setId((int) $dados['id']);
-        $turma->setQtdAlunos((int) $dados['qtd_alunos']);
+        $qtd = empty($dados['qtd_alunos']) ? 0 : (int) $dados['qtd_alunos'];
+        $turma->setQtdAlunos($qtd);
         return $turma;
     }
 }

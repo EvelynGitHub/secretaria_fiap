@@ -28,6 +28,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/alunos">Alunos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/turmas">Turmas</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
