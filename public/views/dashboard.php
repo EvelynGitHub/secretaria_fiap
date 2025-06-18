@@ -1,6 +1,5 @@
 <?php
 $title = "Dashboard";
-ob_start();
 ?>
 <div class="jumbotron">
     <h1 class="display-4">Bem-vindo ao Sistema de Alunos!</h1>
@@ -10,7 +9,3 @@ ob_start();
     <a class="btn btn-primary btn-lg" href="/alunos" role="button">Gerenciar Alunos</a>
     <a class="btn btn-primary btn-lg" href="/doc" role="button">Documentação da API</a>
 </div>
-<?php
-$content = ob_get_clean();
-include __DIR__ . '/layout.php';
-?>

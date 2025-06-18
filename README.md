@@ -143,6 +143,7 @@ Documentação da API: http://localhost:8080/doc/#/
 
 Frontend da aplicação: http://localhost:8080/
 
+Os dado do admin padrão já estão no swagger e no formulário de login
 
 # Autor
 

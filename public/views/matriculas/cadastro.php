@@ -1,6 +1,6 @@
 <?php
-$alunos = $alunos ?? null;
-$turmas = $turmas ?? null; // Obtido do route arguments
+$alunos = $alunos ?? [];
+$turmas = $turmas ?? []; // Obtido do route arguments
 $title = "Edição de turma";
 
 ?>

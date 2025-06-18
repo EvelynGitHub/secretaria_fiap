@@ -4,130 +4,81 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Psr\Http\Server\RequestHandlerInterface;
 use SecretariaFiap\Adapter\Controller\AdminController;
 use SecretariaFiap\Adapter\Controller\AlunoController;
 use SecretariaFiap\Adapter\Controller\MatriculaController;
 use SecretariaFiap\Adapter\Controller\TurmaController;
+use SecretariaFiap\Helpers\View;
 use SecretariaFiap\Infra\Http\Middleware;
+use SecretariaFiap\Infra\Http\MiddlewareView;
 use Slim\Factory\AppFactory;
-use Slim\Views\PhpRenderer;
 use Slim\Routing\RouteCollectorProxy;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-session_start();
-
-header("Accept: application/json; charset=UTF-8"); //Aceita apenas coisas enviadas como JSON
-header("Content-Type: application/json; charset=UTF-8"); //tipo de retorno
-
+// Headers Http 
+require_once __DIR__ . "/../config/headersHttp.php";
 // Inicio: Injeção de dependência 
 require_once __DIR__ . "/../config/dependencyInjection.php"; // $container
-
-// $container->set('view', fn() => new PhpRenderer(__DIR__ . '/views'));
-
 AppFactory::setContainer($container);
 // Fim: Injeção de dependência 
 
+// Inicio: Definição das rotas
 $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 $app->addErrorMiddleware(true, true, true);
-
 
 // ----------------------------------------------------------------------
 // Endpoints (FRONTEND) - Estes devem renderizam as views
 // ----------------------------------------------------------------------
 
-// Middleware de Autenticação 
-$authMiddlewareTokenExiste = function (Request $request, RequestHandlerInterface $handler) {
-    $cookies = $request->getCookieParams();
-    $token = $cookies['auth_token'] ?? null;
-
-    // Se o token existe segue para o Middleware::class
-    if ($token) {
-        return $handler->handle($request);
-    }
-    // Se não existe redireciona
-    return (new \Slim\Psr7\Response())->withHeader('Location', '/login')->withStatus(302);
-};
-
-
 $app->get('/', function (Request $request, Response $response) {
     return $response->withHeader('Location', '/login')->withStatus(302);
 });
 
-function renderizarView(Response $response, string $viewPath, ?string $layoutPath = null, array $dados = []): Response
-{
-    extract($dados); // torna cada chave do array uma variável
-    ob_start();
-    include $viewPath;
-    $content = ob_get_clean();
-
-    if ($layoutPath) {
-        // Define $content como variável usada no layout
-        ob_start();
-        include $layoutPath;
-        $finalOutput = ob_get_clean();
-    } else {
-        $finalOutput = $content;
-    }
-
-    $response->getBody()->write($finalOutput);
-    return $response->withHeader('Content-Type', 'text/html');
-}
-
-// Rotas Frontend que renderizam as views
-
 $app->get('/login', function (Request $request, Response $response, array $args) {
-    return renderizarView($response, __DIR__ . '/views/login.php', __DIR__ . '/views/layout_login.php');
+    return View::renderizar($response, __DIR__ . '/views/login.php', __DIR__ . '/views/layout_login.php');
 });
 
-
-// Grupo de rotas protegidas
+// Grupo de rotas VIEW protegidas
 $app->group('', function (RouteCollectorProxy $group) {
     $group->get('/dashboard', function (Request $request, Response $response, array $args) {
-        return renderizarView($response, __DIR__ . '/views/dashboard.php');
+        return View::renderizar($response, __DIR__ . '/views/dashboard.php');
     });
 
     // Alunos
     $group->get('/alunos', function (Request $request, Response $response, array $args) {
-        return renderizarView($response, __DIR__ . '/views/alunos/listagem.php');
+        return View::renderizar($response, __DIR__ . '/views/alunos/listagem.php');
     });
 
     $group->get('/alunos/cadastro', function (Request $request, Response $response, array $args) {
-        return renderizarView($response, __DIR__ . '/views/alunos/cadastro.php', __DIR__ . '/views/layout.php');
+        return View::renderizar($response, __DIR__ . '/views/alunos/cadastro.php', __DIR__ . '/views/layout.php');
     });
 
     $group->get('/alunos/edicao/{uuid}', function (Request $request, Response $response, array $args) {
-        return renderizarView(
-            $response,
-            __DIR__ . '/views/alunos/edicao.php',
-            __DIR__ . '/views/layout.php',
-            ['uuid' => $args['uuid']] // <- torna $uuid acessível na view
-        );
+        return View::renderizar($response, __DIR__ . '/views/alunos/edicao.php', null, ['uuid' => $args['uuid']]);
     });
 
     // Turmas
     $group->get('/turmas', function (Request $request, Response $response, array $args) {
-        return renderizarView($response, __DIR__ . '/views/turmas/listagem.php');
+        return View::renderizar($response, __DIR__ . '/views/turmas/listagem.php');
     });
 
     $group->get('/turmas/cadastro', function (Request $request, Response $response, array $args) {
-        return renderizarView($response, __DIR__ . '/views/turmas/cadastro.php', __DIR__ . '/views/layout.php');
+        return View::renderizar($response, __DIR__ . '/views/turmas/cadastro.php', __DIR__ . '/views/layout.php');
     });
 
     $group->get('/turmas/edicao/{uuid}', function (Request $request, Response $response, array $args) {
-        return renderizarView(
-            $response,
-            __DIR__ . '/views/turmas/edicao.php',
-            __DIR__ . '/views/layout.php',
-            ['uuid' => $args['uuid']] // <- torna $uuid acessível na view
-        );
+        return View::renderizar($response, __DIR__ . '/views/turmas/edicao.php', null, ['uuid' => $args['uuid'] ?? null]);
     });
 
-    // ... Outras rotas do frontend (turmas, matrículas, etc.)
-})->add(Middleware::class)->add($authMiddlewareTokenExiste);
+    // Matricula
+    $group->get('/matriculas', function (Request $request, Response $response, array $args) {
+        return View::renderizar($response, __DIR__ . '/views/matriculas/cadastro.php');
+    });
+
+})->add(Middleware::class)->add(MiddlewareView::class);
 
 
 // ----------------------------------------------------------------------
@@ -158,5 +109,5 @@ $app->group('/api', function (RouteCollectorProxy $api) {
 
 })->add(Middleware::class);
 
-
 $app->run();
+// Fim: Definição das rotas
