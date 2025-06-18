@@ -2,7 +2,6 @@
 // Este arquivo vai precisar de um ID de turma para carregar os dados
 $uuid = $uuid ?? null; // Obtido do route arguments
 $title = "Edição de turma";
-ob_start();
 ?>
 <h2>Editar turma</h2>
 <form id="turmaEditForm">

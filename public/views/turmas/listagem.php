@@ -1,6 +1,5 @@
 <?php
 $title = "Listagem de turmas";
-ob_start();
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Turmas Cadastradas</h2>
@@ -26,6 +25,4 @@ ob_start();
 $page_scripts = '
 <script src="/js/turmas.js"></script>
 ';
-$content = ob_get_clean();
-include __DIR__ . '/../layout.php';
 ?>

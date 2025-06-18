@@ -38,8 +38,6 @@
         $('#btnLogin').on('click', login)
 
         function login() {
-            // e.preventDefault();
-
             const username = $('#username').val();
             const password = $('#password').val();
             const errorMessage = $('#loginError');
@@ -68,38 +66,5 @@
                 }
             });
         }
-
-
-        // $('#loginForm').on('submit', function (e) {
-        //     e.preventDefault();
-
-        //     const username = $('#username').val();
-        //     const password = $('#password').val();
-        //     const errorMessage = $('#loginError');
-
-        //     errorMessage.addClass('d-none').text(''); // Esconde mensagens de erro anteriores
-
-        //     $.ajax({
-        //         url: '/api/admin/login', // Seu endpoint de login do Slim
-        //         method: 'POST',
-        //         contentType: 'application/json',
-        //         data: JSON.stringify({ username: username, password: password }),
-        //         success: function (response) {
-        //             if (response.success) {
-        //                 window.location.href = '/dashboard'; // Redireciona para o dashboard após o login
-        //             } else {
-        //                 errorMessage.text(response.message || 'Credenciais inválidas.').removeClass('d-none');
-        //             }
-        //         },
-        //         error: function (xhr, status, error) {
-        //             let message = 'Ocorreu um erro ao tentar fazer login.';
-        //             if (xhr.responseJSON && xhr.responseJSON.message) {
-        //                 message = xhr.responseJSON.message;
-        //             }
-        //             errorMessage.text(message).removeClass('d-none');
-        //             console.error(xhr.responseText);
-        //         }
-        //     });
-        // });
     });
 </script>

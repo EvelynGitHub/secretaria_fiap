@@ -1,6 +1,5 @@
 <?php
 $title = "Cadastro de Aluno";
-ob_start();
 ?>
 <h2>Cadastrar Novo Aluno</h2>
 <form id="alunoForm">
@@ -68,7 +67,3 @@ ob_start();
         });
     });
 </script>
-<!-- ';
-$content = ob_get_clean();
-include __DIR__ . '/../layout.php';
-?> -->

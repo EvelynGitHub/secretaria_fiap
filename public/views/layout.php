@@ -31,6 +31,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/turmas">Turmas</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/matriculas">Matriculas</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">

@@ -1,6 +1,5 @@
 <?php
 $title = "Cadastro de Turma";
-ob_start();
 ?>
 <h2>Cadastrar Novo Turma</h2>
 <form id="turmaForm">
@@ -53,7 +52,3 @@ ob_start();
         });
     });
 </script>
-<!-- ';
-$content = ob_get_clean();
-include __DIR__ . '/../layout.php';
-?> -->

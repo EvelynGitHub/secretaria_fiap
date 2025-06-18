@@ -2,7 +2,6 @@
 // Este arquivo vai precisar de um ID de aluno para carregar os dados
 $uuid = $uuid ?? null; // Obtido do route arguments
 $title = "Edição de Aluno";
-ob_start();
 ?>
 <h2>Editar Aluno</h2>
 <form id="alunoEditForm">
