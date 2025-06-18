@@ -9,6 +9,8 @@
     <link href="/css/datatables.min.css" rel="stylesheet">
     <link href="/css/custom.css" rel="stylesheet">
 
+    <?php echo $page_css ?? ''; ?>
+
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/datatables.min.js"></script>

@@ -1,0 +1,4 @@
+ .select2-selection.select2-selection--single {
+     box-shadow: none !important;
+     outline: none !important;
+ }

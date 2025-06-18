@@ -8,12 +8,12 @@ use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use RuntimeException;
 use SecretariaFiap\Helpers\TokenHelper;
 use Slim\Psr7\Response;
 
 class Middleware
 {
-    // https://www.slimframework.com/docs/v4/objects/request.html#attributes
     public function __invoke(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
@@ -31,7 +31,7 @@ class Middleware
             }
 
             if (is_null($jwt)) {
-                throw new Exception('Token não informado.', 401);
+                throw new RuntimeException('Token não informado.', 401);
             }
 
             $payload = TokenHelper::decodificar($jwt);
@@ -44,7 +44,7 @@ class Middleware
 
             return $response;
 
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return $this->setError($e);
         }
     }
@@ -61,8 +61,21 @@ class Middleware
             $exception["file"] = $objError->getFile();
             $exception["line"] = $objError->getLine();
 
-            $response->getBody()->write(json_encode($exception));
-            $response->withStatus($objError->getCode());
+            if ($objError instanceof RuntimeException) {
+                // Se for um erro de RuntimeException, não redireciona para o login
+                $response = $response->withHeader('Location', '/login')
+                    ->withStatus($objError->getCode());
+
+                $response->getBody()->write(json_encode($exception));
+            } elseif ($objError instanceof Exception) {
+                // Se for Exception ('Token inválido ou expirado.'), destrói o cookie e redireciona para o login
+                $response = $response
+                    ->withHeader('Set-Cookie', 'auth_token=deleted; Path=/; HttpOnly; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; SameSite=None; Secure')
+                    ->withHeader('Location', '/login')
+                    ->withStatus($objError->getCode());
+                $response->getBody()->write(json_encode($exception));
+            }
+
 
             return $response;
         } catch (\Throwable $th) {
@@ -71,8 +84,9 @@ class Middleware
             $exception["file"] = $th->getFile();
             $exception["line"] = $th->getLine();
 
-            $response->getBody()->write(json_encode($exception));
-            $response->withStatus($objError->getCode());
+            $response->withHeader('Location', '/login')
+                ->withStatus($objError->getCode())
+                ->getBody()->write(json_encode($exception));
 
             return $response;
         }
