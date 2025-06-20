@@ -27,7 +27,6 @@ HTML;
         </select>
 
     </div>
-    <div class="alert alert-danger d-none" role="alert" id="formError"></div>
     <button type="submit" class="btn btn-success">Matricular</button>
 </form>
 <hr />

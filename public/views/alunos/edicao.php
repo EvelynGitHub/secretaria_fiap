@@ -40,8 +40,9 @@ $title = "Edição de Aluno";
         // Carregar dados do aluno ao carregar a página
         if (alunoId) {
             $.ajax({
-                url: `/api/alunos/${alunoId}`, // Seu endpoint Slim para buscar aluno por ID
+                url: `/api/alunos/${alunoId}`,
                 method: "GET",
+                dataType: "json",
                 success: function (response) {
                     if (response.uuid) {
                         const aluno = response;
@@ -50,12 +51,20 @@ $title = "Edição de Aluno";
                         $("#cpf").val(aluno.cpf);
                         $("#data_nascimento").val(aluno.data_nascimento); // Certifique-se que o formato é YYYY-MM-DD
                     } else {
-                        errorMessage.text(response.message || "Aluno não encontrado.").removeClass("d-none");
+                        mostrarToast({
+                            mensagem: response.message || "Aluno não encontrado.",
+                            tipo: 'danger',
+                            tempo: 10000
+                        });
                     }
                 },
                 error: function (xhr, status, error) {
-                    errorMessage.text("Erro ao carregar dados do aluno.").removeClass("d-none");
                     console.error(xhr.responseText);
+                    mostrarToast({
+                        mensagem: errorData ? errorData.message : "Ocorreu um erro ao cadastrar o aluno.",
+                        tipo: 'danger',
+                        tempo: 10000
+                    });
                 }
             });
         }
@@ -71,11 +80,11 @@ $title = "Edição de Aluno";
                 senha: $("#senha").val() ?? null,
                 data_nascimento: $("#data_nascimento").val()
             };
-            errorMessage.addClass("d-none");
 
             $.ajax({
                 url: `/api/alunos/${alunoId}`,
                 method: "PUT",
+                dataType: 'json',
                 contentType: "application/json",
                 data: JSON.stringify(formData),
                 success: function (response) {
@@ -83,14 +92,22 @@ $title = "Edição de Aluno";
                         alert("Aluno atualizado com sucesso!");
                         window.location.href = "/alunos"; // Redireciona para a listagem
                     } else {
-                        errorMessage.text(response.message || "Erro ao atualizar aluno.").removeClass("d-none");
-                        console.log("Possivelmente EMAIL ou CPF duplicado ao editar aluno.")
+                        mostrarToast({
+                            mensagem: response.message || "Erro ao atualizar aluno.",
+                            tipo: 'danger',
+                            tempo: 10000
+                        });
+                        console.log("Possivelmente EMAIL ou CPF duplicado ao editar aluno.", response)
                     }
                 },
                 error: function (xhr, status, error) {
                     const errorData = xhr.responseJSON;
-                    errorMessage.text(errorData ? errorData.message : "Ocorreu um erro ao atualizar o aluno.").removeClass("d-none");
                     console.error(xhr.responseText);
+                    mostrarToast({
+                        mensagem: errorData ? errorData.message : "Ocorreu um erro ao atualizar o aluno.",
+                        tipo: 'danger',
+                        tempo: 10000
+                    });
                 }
             });
         });

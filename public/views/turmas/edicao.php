@@ -14,7 +14,6 @@ $title = "Edição de turma";
         <label for="descricao" class="form-label">Descrição</label>
         <input type="text" class="form-control" id="descricao" name="descricao" required>
     </div>
-    <div class="alert alert-danger d-none" role="alert" id="formError"></div>
     <button type="submit" class="btn btn-success">Atualizar</button>
     <a href="/turmas" class="btn btn-secondary">Voltar</a>
 </form>
@@ -23,25 +22,34 @@ $title = "Edição de turma";
 <script>
     $(document).ready(function () {
         const turmaId = $("#turmaId").val();
-        const errorMessage = $("#formError");
 
         // Carregar dados do turma ao carregar a página
         if (turmaId) {
             $.ajax({
-                url: `/api/turmas/${turmaId}`, // Seu endpoint Slim para buscar turma por ID
+                url: `/api/turmas/${turmaId}`,
                 method: "GET",
+                dataType: "json",
                 success: function (response) {
                     if (response.uuid) {
                         const turma = response;
                         $("#nome").val(turma.nome);
-                        $("#descricao").val(turma.descricao);// Certifique-se que o formato é YYYY-MM-DD
+                        $("#descricao").val(turma.descricao);
                     } else {
-                        errorMessage.text(response.message || "turma não encontrado.").removeClass("d-none");
+                        mostrarToast({
+                            mensagem: response.message || "Turma não encontrada.",
+                            tipo: 'danger',
+                            tempo: 10000
+                        });
                     }
                 },
                 error: function (xhr, status, error) {
-                    errorMessage.text("Erro ao carregar dados do turma.").removeClass("d-none");
+                    const errorData = xhr.responseJSON;
                     console.error(xhr.responseText);
+                    mostrarToast({
+                        mensagem: errorData ? errorData.message : "Erro ao carregar dados do turma.",
+                        tipo: 'danger',
+                        tempo: 10000
+                    });
                 }
             });
         }
@@ -54,25 +62,45 @@ $title = "Edição de turma";
                 nome: $("#nome").val(),
                 descricao: $("#descricao").val(),
             };
-            errorMessage.addClass("d-none");
 
             $.ajax({
                 url: `/api/turmas/${turmaId}`,
                 method: "PUT",
+                dataType: "json",
                 contentType: "application/json",
                 data: JSON.stringify(formData),
                 success: function (response) {
+                    console.log(response);
+
                     if (response.uuid) {
-                        alert("turma atualizado com sucesso!");
-                        window.location.href = "/turmas"; // Redireciona para a listagem
+                        mostrarToast({
+                            mensagem: "Turma cadastrada com sucesso!",
+                            tipo: 'success',
+                            tempo: 5000
+                        });
+
+                        let continuar = $("#check_cadastro").is(':checked')
+
+                        if (!continuar) {
+                            alert("Turma atualizada com sucesso!");
+                            window.location.href = "/turmas"; // Redireciona para a listagem
+                        }
                     } else {
-                        errorMessage.text(response.message || "Erro ao atualizar turma.").removeClass("d-none");
+                        mostrarToast({
+                            mensagem: response.message || "Erro ao atualizar turma.",
+                            tipo: 'danger',
+                            tempo: 10000
+                        });
                     }
                 },
                 error: function (xhr, status, error) {
                     const errorData = xhr.responseJSON;
-                    errorMessage.text(errorData ? errorData.message : "Ocorreu um erro ao atualizar o turma.").removeClass("d-none");
                     console.error(xhr.responseText);
+                    mostrarToast({
+                        mensagem: errorData ? errorData.message : "Ocorreu um erro ao tualizar turma..",
+                        tipo: 'danger',
+                        tempo: 10000
+                    });
                 }
             });
         });

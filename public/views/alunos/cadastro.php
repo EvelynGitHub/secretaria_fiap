@@ -23,7 +23,14 @@ $title = "Cadastro de Aluno";
         <label for="senha" class="form-label">Senha</label>
         <input type="password" class="form-control" id="senha" name="senha" required>
     </div>
-    <div class="alert alert-danger d-none" role="alert" id="formError"></div>
+    <div class="mb-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" value="" id="check_cadastro" checked>
+            <label class="form-check-label" for="check_cadastro">
+                Continuar cadastrando
+            </label>
+        </div>
+    </div>
     <button type="submit" class="btn btn-success">Salvar</button>
     <a href="/alunos" class="btn btn-secondary">Voltar</a>
 </form>
@@ -41,27 +48,45 @@ $title = "Cadastro de Aluno";
                 senha: $("#senha").val(),
                 data_nascimento: $("#data_nascimento").val()
             };
-            const errorMessage = $("#formError");
-            errorMessage.addClass("d-none");
 
             $.ajax({
                 url: "/api/alunos", // Seu endpoint Slim para cadastro de aluno
                 method: "POST",
                 contentType: "application/json",
+                dataType: 'json',
                 data: JSON.stringify(formData),
                 success: function (response, status) {
                     //Se não retornar o UUID deu erro
                     if (response.uuid) {
-                        alert("Aluno cadastrado com sucesso!");
-                        window.location.href = "/alunos"; // Redireciona para a listagem
+                        mostrarToast({
+                            mensagem: "Aluno cadastrado com sucesso!",
+                            tipo: 'success',
+                            tempo: 5000
+                        });
+
+                        let continuar = $("#check_cadastro").is(':checked')
+
+                        if (!continuar) {
+                            // alert("Aluno cadastrado com sucesso!");                            
+                            window.location.href = "/alunos"; // Redireciona para a listagem
+                        }
+
                     } else {
-                        errorMessage.text(response.message || "Erro ao cadastrar aluno.").removeClass("d-none");
+                        mostrarToast({
+                            mensagem: response.message || "Erro ao cadastrar aluno.",
+                            tipo: 'danger',
+                            tempo: 10000
+                        });
                     }
                 },
                 error: function (xhr, status, error) {
                     const errorData = xhr.responseJSON;
-                    errorMessage.text(errorData ? errorData.message : "Ocorreu um erro ao cadastrar o aluno.").removeClass("d-none");
                     console.error(xhr.responseText);
+                    mostrarToast({
+                        mensagem: errorData ? errorData.message : "Ocorreu um erro ao cadastrar o aluno.",
+                        tipo: 'danger',
+                        tempo: 10000
+                    });
                 }
             });
         });

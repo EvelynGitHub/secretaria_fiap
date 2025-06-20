@@ -11,7 +11,15 @@ $title = "Cadastro de Turma";
         <label for="descricao" class="form-label">Descrição</label>
         <input type="text" class="form-control" id="descricao" name="descricao" required>
     </div>
-    <div class="alert alert-danger d-none" role="alert" id="formError"></div>
+
+    <div class="mb-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" value="" id="check_cadastro" checked>
+            <label class="form-check-label" for="check_cadastro">
+                Continuar cadastrando
+            </label>
+        </div>
+    </div>
     <button type="submit" class="btn btn-success">Salvar</button>
     <a href="/turmas" class="btn btn-secondary">Voltar</a>
 </form>
@@ -26,27 +34,46 @@ $title = "Cadastro de Turma";
                 nome: $("#nome").val(),
                 descricao: $("#descricao").val()
             };
-            const errorMessage = $("#formError");
-            errorMessage.addClass("d-none");
 
             $.ajax({
                 url: "/api/turmas", // Seu endpoint Slim para cadastro de turma
                 method: "POST",
                 contentType: "application/json",
                 data: JSON.stringify(formData),
+                dataType: "json",
                 success: function (response, status) {
                     //Se não retornar o UUID deu erro
                     if (response.uuid) {
-                        alert("Turma cadastrado com sucesso!");
-                        window.location.href = "/turmas"; // Redireciona para a listagem
+
+                        mostrarToast({
+                            mensagem: "Turma cadastrada com sucesso!",
+                            tipo: 'success',
+                            tempo: 5000
+                        });
+
+                        let continuar = $("#check_cadastro").is(':checked')
+
+                        if (!continuar) {
+                            alert("Turma cadastrada com sucesso!");
+                            window.location.href = "/turmas"; // Redireciona para a listagem
+                        }
+
                     } else {
-                        errorMessage.text(response.message || "Erro ao cadastrar turma.").removeClass("d-none");
+                        mostrarToast({
+                            mensagem: response.message || "Erro ao cadastrar turma.",
+                            tipo: 'danger',
+                            tempo: 10000
+                        });
                     }
                 },
                 error: function (xhr, status, error) {
                     const errorData = xhr.responseJSON;
-                    errorMessage.text(errorData ? errorData.message : "Ocorreu um erro ao cadastrar turma.").removeClass("d-none");
                     console.error(xhr.responseText);
+                    mostrarToast({
+                        mensagem: errorData ? errorData.message : "Ocorreu um erro ao cadastrar turma.",
+                        tipo: 'danger',
+                        tempo: 10000
+                    })
                 }
             });
         });
