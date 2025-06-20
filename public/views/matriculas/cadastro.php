@@ -11,7 +11,6 @@ HTML;
 ?>
 
 <h1>Matricular Aluno em Turma</h1>
-<p>Não deu tempo de deixar bonito </p>
 
 <form method="POST" id="form_matricula">
     <div class="mb-3">
@@ -59,8 +58,8 @@ HTML;
 <?php include __DIR__ . '/../common/modal_confirm.php'; // Modal de confirmação de exclusão ?>
 
 <?php
-$page_scripts = '
+$page_scripts = <<<HTML
 <script src="/js/select2.min.js"></script>
 <script src="/js/matriculas.js"></script>
-';
+HTML;
 ?>

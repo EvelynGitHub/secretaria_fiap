@@ -1,6 +1,6 @@
 $(document).ready(function () {
     const selectFiltroTurma = $('#filtro_turma');
-    const errorMessage = $("#formError");
+
     // Variável para armazenar o 'draw' da requisição atual do Datatables
     // Uso porque não quero modificar meu backend
     let currentDraw = 0;
@@ -96,7 +96,7 @@ $(document).ready(function () {
         "paging": true,
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
         "pageLength": 10,
-        "deferLoading": 0
+        "deferLoading": 0 // Não carrega dados inicialmente, apenas quando .load() é chamado
     });
 
 
@@ -119,7 +119,6 @@ $(document).ready(function () {
             uuid_aluno: uuidAluno,
             uuid_turma: uuidTurma
         };
-        errorMessage.addClass("d-none");
 
         $.ajax({
             url: `/api/matriculas`,
@@ -129,20 +128,30 @@ $(document).ready(function () {
             success: function (response) {
                 const res = JSON.parse(response)
 
-                alunosTurmaTable.ajax.reload();
-
                 if (res.sucesso) {
-                    errorMessage.addClass("alert-success");
-                    errorMessage.removeClass("alert-danger");
-                    errorMessage.text(res.mensagem).removeClass("d-none");
+                    alunosTurmaTable.ajax.reload();
+                    mostrarToast({
+                        mensagem: res.mensagem,
+                        tipo: 'success',
+                        tempo: 5000
+                    });
                 } else {
-                    errorMessage.text(res.mensagem).removeClass("d-none");
+                    mostrarToast({
+                        mensagem: res.mensagem,
+                        tipo: 'danger',
+                        tempo: 5000
+                    });
                 }
             },
             error: function (xhr, status, error) {
                 const errorData = xhr.responseJSON;
-                errorMessage.text(errorData ? errorData.message : "Ocorreu um erro.").removeClass("d-none");
                 console.error(xhr.responseText);
+
+                mostrarToast({
+                    mensagem: errorData ? errorData.message : "Ocorreu um erro.",
+                    tipo: 'danger',
+                    tempo: 5000
+                });
             }
         });
 

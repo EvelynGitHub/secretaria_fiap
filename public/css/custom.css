@@ -1,0 +1,18 @@
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.8);
+    animation: progress-bar-animation linear forwards;
+}
+
+@keyframes progress-bar-animation {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
