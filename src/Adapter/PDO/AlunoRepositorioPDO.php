@@ -136,18 +136,19 @@ class AlunoRepositorioPDO implements AlunoRepositorio
      * Lista alunos por turma, retornando um objeto de paginação.
      *
      * @param string $uuidTurma O UUID da turma a ser filtrada.
+     * @param string $nome Nome do aluno para filtrar ainda mais
      * @param int $offset O offset para a paginação.
      * @param int $limit O limite de registros por página.
      * @return Paginacao<Aluno> Um objeto Paginacao contendo uma lista de objetos Aluno.
      */
-    public function listarPorTurma(string $uuidTurma, int $offset = 0, int $limit = 10): Paginacao
+    public function listarPorTurma(string $uuidTurma, string $nome = null, int $offset = 0, int $limit = 10): Paginacao
     {
         // 1. Consulta para obter os dados da página atual
         $sqlDados = "SELECT alunos.* 
             FROM alunos 
             JOIN matriculas ON alunos.id = matriculas.aluno_id 
             JOIN turmas ON matriculas.turma_id = turmas.id 
-            WHERE turmas.uuid = :uuidTurma
+            WHERE turmas.uuid = :uuidTurma AND alunos.nome LIKE :nome 
             ORDER BY alunos.nome ASC
             LIMIT :offset, :limit";
 
@@ -155,6 +156,7 @@ class AlunoRepositorioPDO implements AlunoRepositorio
         $stmtDados->bindValue(':uuidTurma', $uuidTurma);
         $stmtDados->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmtDados->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmtDados->bindValue(':nome', "%{$nome}%");
         $stmtDados->execute();
 
         $alunos = [];

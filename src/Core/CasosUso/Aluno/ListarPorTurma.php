@@ -17,14 +17,14 @@ class ListarPorTurma
         $this->repositorio = $alunoRepositorio;
     }
 
-    public function executar(string $uuidTurma, int $limit = 10, int $offset = 0): OutputPaginacaoObject
+    public function executar(string $uuidTurma, string $nome = null, int $limit = 10, int $offset = 0): OutputPaginacaoObject
     {
         // Pode-se adicionar validações para o UUID da turma, se necessário.
         if (empty($uuidTurma)) {
             throw new \InvalidArgumentException("O UUID da turma não pode ser vazio.");
         }
 
-        $alunosPaginados = $this->repositorio->listarPorTurma($uuidTurma, $offset, $limit);
+        $alunosPaginados = $this->repositorio->listarPorTurma($uuidTurma, $nome, $offset, $limit);
 
         $mapper = function (Aluno $aluno): OutputObject {
             return OutputObject::create([

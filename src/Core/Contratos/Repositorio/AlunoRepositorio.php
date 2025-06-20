@@ -29,6 +29,6 @@ interface AlunoRepositorio
      * @param int $limit O limite de registros por página.
      * @return Paginacao<Aluno> Um objeto Paginacao contendo uma lista de objetos Aluno.
      */
-    public function listarPorTurma(string $uuidTurma, int $offset = 0, int $limit = 10): Paginacao;
+    public function listarPorTurma(string $uuidTurma, string $nome = null, int $offset = 0, int $limit = 10): Paginacao;
 
 }

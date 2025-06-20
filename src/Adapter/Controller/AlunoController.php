@@ -126,10 +126,11 @@ class AlunoController
             $uuid = $this->verificarUuidRequest($args, 'uuid_turma');
 
             $params = $request->getQueryParams();
+            $nome = $params['nome'] ?? null;
             $limit = (int) ($params['limit'] ?? 10);
             $offset = (int) ($params['offset'] ?? 0);
 
-            $output = $this->casoUsoListarPorTurma->executar($uuid, $limit, $offset);
+            $output = $this->casoUsoListarPorTurma->executar($uuid, $nome, $limit, $offset);
 
             return HttpResposta::sucesso($output->jsonSerialize(), 200);
         } catch (\Throwable $th) {
